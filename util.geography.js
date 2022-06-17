@@ -2,6 +2,25 @@ const closest = (creep, targets) => {
     return _.sortBy(targets, (s) => creep.pos.getRangeTo(s))[0];
 };
 
+const getEnergyStructures = (room) => {
+    var myEnergyStructures = room.find(FIND_MY_STRUCTURES, {
+        filter: (structure) =>
+            [
+                STRUCTURE_SPAWN,
+                STRUCTURE_EXTENSION,
+                STRUCTURE_CONTAINER,
+                STRUCTURE_STORAGE,
+            ].includes(structure.structureType),
+    });
+
+    var otherEnergyStructures = room.find(FIND_STRUCTURES, {
+        filter: (structure) =>
+            [STRUCTURE_CONTAINER].includes(structure.structureType),
+    });
+
+    return [...myEnergyStructures, ...otherEnergyStructures];
+};
+
 module.exports = {
     //closest place to transfer energy to that has availability
     closestEnergyTransfer: (
@@ -9,15 +28,10 @@ module.exports = {
         ignoreSpawn = false,
         prioritizeSpawn = true
     ) => {
-        var energyStructures = creep.room.find(FIND_MY_STRUCTURES, {
-            filter: (structure) =>
-                [
-                    STRUCTURE_SPAWN,
-                    STRUCTURE_EXTENSION,
-                    STRUCTURE_STORAGE,
-                ].includes(structure.structureType) &&
-                structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
-        });
+        var energyStructures = _.filter(
+            getEnergyStructures(creep.room),
+            (s) => s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+        );
 
         if (
             prioritizeSpawn &&
@@ -54,15 +68,10 @@ module.exports = {
         ignoreSpawn = false,
         prioritizeNonSpawn = true
     ) => {
-        var energyStructures = creep.room.find(FIND_MY_STRUCTURES, {
-            filter: (structure) =>
-                [
-                    STRUCTURE_SPAWN,
-                    STRUCTURE_EXTENSION,
-                    STRUCTURE_STORAGE,
-                ].includes(structure.structureType) &&
-                structure.store[RESOURCE_ENERGY] > 1, //1 because we dont want to keep milking the spawn at 1 energy each time
-        });
+        var energyStructures = _.filter(
+            getEnergyStructures(creep.room),
+            (s) => s.store[RESOURCE_ENERGY] > 1
+        );
 
         if (
             prioritizeNonSpawn &&

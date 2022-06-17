@@ -5,7 +5,7 @@ const { construct } = require("util.construction");
 const makeName = (role) => role.substring(0, 1) + Game.time.toString(16);
 
 module.exports = {
-    spawnCreep: (room, role, prioritise) => {
+    spawnCreep: (room, role, sizeLimit, prioritise) => {
         //how much energy do we have to build with?
         var available = availableBuildEnergy(room);
 
@@ -13,7 +13,12 @@ module.exports = {
         var module = getModuleByRole(role);
 
         //construct body blueprint from module
-        var body = construct(module.blueprint, available, prioritise);
+        var body = construct(
+            module.blueprint,
+            available,
+            sizeLimit,
+            prioritise
+        );
 
         //dont have enough to create this body, then quit
         if (available < cost(body)) return;

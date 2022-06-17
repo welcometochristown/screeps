@@ -4,19 +4,29 @@ const getAction = (creep) => {
         return "suicide";
     }
 
-    //if there are no structures with low points, lets build
+    //anything to repair (below 50% health)?
     if (
-        !creep.room.find(FIND_STRUCTURES, {
+        creep.room.find(FIND_STRUCTURES, {
             filter: (object) =>
-                object.hits < object.hitsMax &&
+                object.hits < object.hitsMax * 0.5 &&
                 object.structureType != STRUCTURE_WALL,
-        }).length &&
-        creep.room.find(FIND_MY_CONSTRUCTION_SITES).length
+        }).length
     ) {
+        return "repair";
+    }
+
+    //anything to build?
+    if (creep.room.find(FIND_MY_CONSTRUCTION_SITES).length) {
         return "build";
     }
 
-    return "repair";
+    //transfer any energy we are carrying
+    if (creep.carry.energy > 0) {
+        return "transfer";
+    }
+
+    //otherwise do some harvesting
+    return "harvest";
 };
 
 const minRequired = (room, structures = room.find(FIND_MY_STRUCTURES)) =>

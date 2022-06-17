@@ -1,7 +1,7 @@
 const { cost, parts } = require("util.calculate");
 
 module.exports = {
-    construct: (blueprint, energy, prioritise) => {
+    construct: (blueprint, energy, sizeLimit, prioritise) => {
         var body = [...blueprint];
 
         //basic body
@@ -9,6 +9,10 @@ module.exports = {
 
         //how big can we make it with energy
         var size = _.floor(energy / basic_cost);
+
+        if (sizeLimit > 0) {
+            size = Math.max(sizeLimit, size);
+        }
 
         //increase by size times
         for (var i = 1; i < size; i++) {

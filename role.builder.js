@@ -8,6 +8,9 @@ const getAction = (creep) => {
     if (creep.room.find(FIND_MY_CONSTRUCTION_SITES).length) {
         return "build";
     }
+    if (creep.carry.energy > 0) {
+        return "transfer";
+    }
     return "suicide";
 };
 
