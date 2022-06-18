@@ -1,6 +1,13 @@
 const { closest } = require("util.geography");
+const { isWorker } = require("util.creep");
 
 const build = (creep) => {
+    if (!isWorker(creep)) {
+        creep.memory.target = undefined;
+        creep.memory.action = undefined;
+        return;
+    }
+
     //if we have no energy to build, time to withdraw some
     if (creep.carry.energy == 0) {
         creep.memory.action =

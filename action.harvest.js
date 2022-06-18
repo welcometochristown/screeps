@@ -1,7 +1,14 @@
 const { targetedAt } = require("util.social");
 const { closest } = require("util.geography");
+const { isWorker } = require("util.creep");
 
 const harvest = (creep) => {
+    if (!isWorker(creep)) {
+        creep.memory.target = undefined;
+        creep.memory.action = undefined;
+        return;
+    }
+
     var sources = creep.room.find(FIND_SOURCES);
 
     if (!creep.memory.target) {

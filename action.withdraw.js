@@ -1,5 +1,6 @@
 const { closestEnergyStorage } = require("util.geography");
 const { spawnQueue } = require("creep.manage");
+const { isWorker } = require("util.creep");
 
 const withdraw = (creep, resource = RESOURCE_ENERGY) => {
     //withdrawal complete, ready for new action
@@ -30,7 +31,8 @@ const withdraw = (creep, resource = RESOURCE_ENERGY) => {
     }
 
     //otherwise go harvesting itself
-    creep.memory.action = "harvest";
+    creep.memory.action =
+        creep.memory.role != isWorker(creep) ? "harvest" : undefined;
     creep.memory.target = undefined;
     return;
 };

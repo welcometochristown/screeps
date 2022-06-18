@@ -1,4 +1,12 @@
+const { isWorker } = require("util.creep");
+
 const upgrade = (creep) => {
+    if (!isWorker(creep)) {
+        creep.memory.target = undefined;
+        creep.memory.action = undefined;
+        return;
+    }
+
     if (creep.carry.energy == 0) {
         creep.memory.action = "withdraw";
         creep.memory.target = undefined;

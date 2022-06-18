@@ -2,8 +2,8 @@ const closest = (creep, targets) => {
     return _.sortBy(targets, (s) => creep.pos.getRangeTo(s))[0];
 };
 
-const getEnergyStructures = (room) => {
-    var myEnergyStructures = room.find(FIND_MY_STRUCTURES, {
+const getEnergyStructures = (room, filter) => {
+    const myEnergyStructures = room.find(FIND_MY_STRUCTURES, {
         filter: (structure) =>
             [
                 STRUCTURE_SPAWN,
@@ -13,49 +13,32 @@ const getEnergyStructures = (room) => {
             ].includes(structure.structureType),
     });
 
-    var otherEnergyStructures = room.find(FIND_STRUCTURES, {
+    const otherEnergyStructures = room.find(FIND_STRUCTURES, {
         filter: (structure) =>
             [STRUCTURE_CONTAINER].includes(structure.structureType),
     });
 
-    return [...myEnergyStructures, ...otherEnergyStructures];
+    return _.filter([...myEnergyStructures, ...otherEnergyStructures], (s) =>
+        filter(s)
+    );
 };
+
+const containsSpawns = (structures) =>
+    _.some(structures, (s) => s.structureType == STRUCTURE_SPAWN);
 
 module.exports = {
     //closest place to transfer energy to that has availability
-    closestEnergyTransfer: (
-        creep,
-        ignoreSpawn = false,
-        prioritizeSpawn = true
-    ) => {
-        var energyStructures = _.filter(
-            getEnergyStructures(creep.room),
+    closestEnergyTransfer: (creep, prioritizeSpawn = true) => {
+        var energyStructures = getEnergyStructures(
+            creep.room,
             (s) => s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
         );
 
-        if (
-            prioritizeSpawn &&
-            _.some(
-                energyStructures,
-                (structure) => structure.structureType == STRUCTURE_SPAWN
-            )
-        ) {
+        //filter to only spawns if the list contains any
+        if (prioritizeSpawn && containsSpawns(energyStructures)) {
             energyStructures = _.filter(
                 energyStructures,
-                (structure) => structure.structureType == STRUCTURE_SPAWN
-            );
-        }
-
-        if (
-            ignoreSpawn &&
-            _.some(
-                energyStructures,
-                (structure) => structure.structureType == STRUCTURE_SPAWN
-            )
-        ) {
-            energyStructures = _.filter(
-                energyStructures,
-                (structure) => structure.structureType != STRUCTURE_SPAWN
+                (s) => s.structureType == STRUCTURE_SPAWN
             );
         }
 
@@ -63,39 +46,17 @@ module.exports = {
     },
 
     //closest place to withdraw energy
-    closestEnergyStorage: (
-        creep,
-        ignoreSpawn = false,
-        prioritizeNonSpawn = true
-    ) => {
-        var energyStructures = _.filter(
-            getEnergyStructures(creep.room),
+    closestEnergyStorage: (creep, ignoreSpawn = false) => {
+        var energyStructures = getEnergyStructures(
+            creep.room,
             (s) => s.store[RESOURCE_ENERGY] > 1
         );
 
-        if (
-            prioritizeNonSpawn &&
-            _.some(
-                energyStructures,
-                (structure) => structure.structureType != STRUCTURE_SPAWN
-            )
-        ) {
+        //filter to only non spawns if the list contains any
+        if (ignoreSpawn && containsSpawns(energyStructures)) {
             energyStructures = _.filter(
                 energyStructures,
-                (structure) => structure.structureType != STRUCTURE_SPAWN
-            );
-        }
-
-        if (
-            ignoreSpawn &&
-            _.some(
-                energyStructures,
-                (structure) => structure.structureType == STRUCTURE_SPAWN
-            )
-        ) {
-            energyStructures = _.filter(
-                energyStructures,
-                (structure) => structure.structureType != STRUCTURE_SPAWN
+                (s) => s.structureType != STRUCTURE_SPAWN
             );
         }
 
