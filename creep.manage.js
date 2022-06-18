@@ -6,7 +6,8 @@ const register = [
     { priority: 0, module: modules.harvester, ratio: 1, sizeLimit: 0 },
     { priority: 1, module: modules.upgrader, ratio: 1, sizeLimit: 0 },
     { priority: 2, module: modules.builder, ratio: 1, sizeLimit: 0 },
-    { priority: 3, module: modules.repairer, ratio: 1, sizeLimit: 1 },
+    { priority: 3, module: modules.courier, ratio: 1, sizeLimit: 1 },
+    { priority: 4, module: modules.repairer, ratio: 1, sizeLimit: 1 },
 ];
 
 const PAUSE_SPAWNING = false;

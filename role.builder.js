@@ -5,13 +5,11 @@ const nonRoadCount = (sites) =>
     Math.ceil(_.filter(sites, (s) => s.structureType != STRUCTURE_ROAD).length);
 
 const getAction = (creep) => {
-    if (creep.room.find(FIND_MY_CONSTRUCTION_SITES).length) {
-        return "build";
+    if (!creep.room.find(FIND_MY_CONSTRUCTION_SITES).length) {
+        return "suicide";
     }
-    if (creep.carry.energy > 0) {
-        return "transfer";
-    }
-    return "suicide";
+
+    return "build";
 };
 
 const minRequired = (room, sites = room.find(FIND_MY_CONSTRUCTION_SITES)) =>

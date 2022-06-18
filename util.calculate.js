@@ -34,5 +34,13 @@ module.exports = {
         );
     },
 
+    spawnsWithEnergyCapacity: (room) => {
+        return room.find(FIND_STRUCTURES, {
+            filter: (structure) =>
+                structure.structureType === STRUCTURE_SPAWN &&
+                structure.store.getFreeCapacity(RESOURCE_ENERGY),
+        });
+    },
+
     parts: parts,
 };

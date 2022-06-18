@@ -3,6 +3,7 @@ const modules = {
     upgrader: require("role.upgrader"),
     builder: require("role.builder"),
     repairer: require("role.repairer"),
+    courier: require("role.courier"),
 };
 
 module.exports = {

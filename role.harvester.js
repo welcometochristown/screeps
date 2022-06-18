@@ -6,7 +6,7 @@ const getAction = (creep) => {
     } else if (creep.room.find(FIND_MY_CONSTRUCTION_SITES).length) {
         return "build"; //assist with building if there are construction sites
     } else {
-        return "repair"; //otherwise repair duty
+        return "upgrade"; //otherwise upgrade duty
     }
 };
 

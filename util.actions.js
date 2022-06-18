@@ -6,6 +6,8 @@ const actions = {
     repair: require("action.repair"),
     build: require("action.build"),
     suicide: require("action.suicide"),
+    courier: require("action.courier"),
+    pickup: require("action.pickup"),
 };
 
 module.exports = {
