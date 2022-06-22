@@ -1,5 +1,7 @@
 const { closest } = require("util.geography");
 const { isWorker } = require("util.creep");
+const { filterByPriority } = require("util.common");
+const { allConstructionSites } = require("util.geography");
 
 const build = (creep) => {
     if (!isWorker(creep)) {
@@ -18,24 +20,21 @@ const build = (creep) => {
         return;
     }
 
-    const sites = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
+    const sites = allConstructionSites(creep);
 
-    //are we building anything else than roads? roads are low priority
-    const hasNonRoadConstructionSites = !!_.some(
+    const prioritisedSites = filterByPriority(
         sites,
-        (s) => s.structureType !== STRUCTURE_ROAD
-    ).length;
-
-    //find the closet construction site (ignore roads if there are non road construction sites)
-    creep.memory.target = closest(
-        creep,
-        _.filter(
-            sites,
-            (s) =>
-                !hasNonRoadConstructionSites ||
-                s.structureType !== STRUCTURE_ROAD
-        )
+        [
+            STRUCTURE_SPAWN,
+            STRUCTURE_TOWER,
+            STRUCTURE_EXTENSION,
+            STRUCTURE_STORAGE,
+            STRUCTURE_ROAD,
+        ],
+        (item) => item.structureType
     );
+
+    creep.memory.target = closest(creep, prioritisedSites);
 
     //if there are no construction sites, kill thyself
     if (!creep.memory.target) {

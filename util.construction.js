@@ -11,7 +11,7 @@ module.exports = {
         var size = _.floor(energy / basic_cost);
 
         if (sizeLimit > 0) {
-            size = Math.max(sizeLimit, size);
+            size = Math.min(sizeLimit, size);
         }
 
         //increase by size times

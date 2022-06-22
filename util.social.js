@@ -4,6 +4,7 @@ const modules = {
     builder: require("role.builder"),
     repairer: require("role.repairer"),
     courier: require("role.courier"),
+    scout: require("role.scout"),
 };
 
 module.exports = {

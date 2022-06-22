@@ -1,3 +1,5 @@
+const { allConstructionSites } = require("util.geography");
+
 const roadCount = (sites) =>
     Math.ceil(_.filter(sites, (s) => s.structureType == STRUCTURE_ROAD).length);
 
@@ -5,14 +7,14 @@ const nonRoadCount = (sites) =>
     Math.ceil(_.filter(sites, (s) => s.structureType != STRUCTURE_ROAD).length);
 
 const getAction = (creep) => {
-    if (!creep.room.find(FIND_MY_CONSTRUCTION_SITES).length) {
+    if (!allConstructionSites(creep).length) {
         return "suicide";
     }
 
     return "build";
 };
 
-const minRequired = (room, sites = room.find(FIND_MY_CONSTRUCTION_SITES)) =>
+const minRequired = (room, sites = allConstructionSites()) =>
     Math.ceil((roadCount(sites) / 10 + nonRoadCount(sites)) / 10);
 
 module.exports = {

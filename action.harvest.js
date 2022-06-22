@@ -2,6 +2,16 @@ const { targetedAt } = require("util.social");
 const { closest } = require("util.geography");
 const { isWorker } = require("util.creep");
 
+const isSourceFull = (source) => {
+    //get source information (i.e limit)
+    var sourceInfo = Memory.sourceInfo.find((i) => i.source.id === source.id);
+
+    //current count of creeps working on this source
+    var creepCount = targetedAt(source).length;
+
+    return creepCount >= sourceInfo.limit;
+};
+
 const harvest = (creep) => {
     if (!isWorker(creep)) {
         creep.memory.target = undefined;
@@ -9,36 +19,39 @@ const harvest = (creep) => {
         return;
     }
 
-    var sources = creep.room.find(FIND_SOURCES);
+    var sources = creep.room.find(FIND_SOURCES, {
+        filter: (source) => source.energy > 0,
+    });
 
     if (!creep.memory.target) {
         var closestSource = closest(creep, sources);
 
-        while (sources.length) {
-            //get the next closest source
-            var source = closest(creep, sources);
+        //TODO: Update to work with multiple rooms
+        // while (sources.length) {
+        //     //get the next closest source
+        //     var source = closest(creep, sources);
 
-            //get source information (i.e limit)
-            var sourceInfo = Memory.sourceInfo.find(
-                (i) => i.source.id === source.id
-            );
-
-            //current count of creeps working on this source
-            var creepCount = targetedAt(source);
-
-            if (creepCount >= sourceInfo.limit) {
-                sources = _.filter(sources, (s) => s.id !== source.id);
-            } else {
-                closestSource = source;
-                break;
-            }
-        }
+        //     //if source is full, remove from list and lets go again
+        //     if (isSourceFull(source)) {
+        //         sources = _.filter(sources, (s) => s.id !== source.id);
+        //     } else {
+        //         closestSource = source;
+        //         break;
+        //     }
+        // }
 
         creep.memory.target = closestSource;
     }
 
     if (creep.memory.target) {
         var source = sources.find((s) => s.id === creep.memory.target.id);
+
+        if (!source) {
+            //current target is no longer in valid source list, find a new one
+            creep.memory.target = undefined;
+            return;
+        }
+
         if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
             creep.moveTo(source);
         }

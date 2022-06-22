@@ -9,16 +9,23 @@ const transfer = (creep) => {
         return;
     }
 
-    creep.memory.target = closestEnergyTransfer(creep);
+    var target = undefined;
 
-    if (creep.memory.target) {
-        if (
-            creep.transfer(creep.memory.target, RESOURCE_ENERGY) ==
-            ERR_NOT_IN_RANGE
-        ) {
-            creep.moveTo(creep.memory.target);
+    if (!creep.memory.target) {
+        //find the closeset {resource} transfer location
+        target = closestEnergyTransfer(creep);
+    } else {
+        target = Game.getObjectById(creep.memory.target.id);
+    }
+
+    if (target) {
+        const result = creep.transfer(target, RESOURCE_ENERGY);
+        if (result == ERR_NOT_IN_RANGE) {
+            creep.moveTo(target);
+            return;
+        } else if (result != OK) {
+            //console.log(`${creep.name} transfer error : ${result}`);
         }
-        return;
     }
 
     //no targets to transfer to

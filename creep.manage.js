@@ -3,11 +3,12 @@ const spawner = require("creep.spawn");
 
 //keep track of how max amount of screeps we want based on existing structures that need action
 const register = [
-    { priority: 0, module: modules.harvester, ratio: 1, sizeLimit: 0 },
-    { priority: 1, module: modules.upgrader, ratio: 1, sizeLimit: 0 },
-    { priority: 2, module: modules.builder, ratio: 1, sizeLimit: 0 },
-    { priority: 3, module: modules.courier, ratio: 1, sizeLimit: 1 },
-    { priority: 4, module: modules.repairer, ratio: 1, sizeLimit: 1 },
+    { priority: 0, module: modules.harvester, sizeLimit: 0 },
+    { priority: 1, module: modules.upgrader, sizeLimit: 0 },
+    { priority: 2, module: modules.builder, sizeLimit: 0 },
+    { priority: 3, module: modules.courier, sizeLimit: 3 },
+    { priority: 4, module: modules.repairer, sizeLimit: 2 },
+    //{ priority: 5, module: modules.scout, sizeLimit: 0 },
 ];
 
 const PAUSE_SPAWNING = false;
@@ -25,7 +26,7 @@ const spawnQueue = (room) => {
         var actualCreeps = _.size(getCreepsByRole(item.module.role));
 
         //do we already have enough assigned for this role?
-        if (actualCreeps >= requiredCreeps * item.ratio) continue;
+        if (actualCreeps >= requiredCreeps) continue;
 
         queue.push(item);
     }
@@ -41,8 +42,9 @@ module.exports = {
         const next = queue[0];
 
         if (!next) return;
-        console.log(`next build : ${next.module.role}`);
-        return !queue.length
+        console.log(`next build in ${room.name}: ${next.module.role}`);
+
+        return !next
             ? null
             : spawner.spawnCreep(room, next.module.role, next.sizeLimit);
     },

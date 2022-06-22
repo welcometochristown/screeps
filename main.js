@@ -1,6 +1,8 @@
-var manager = require("creep.manage");
-var actioner = require("creep.action");
-var memory = require("util.memory");
+const manager = require("creep.manage");
+const creepActioner = require("creep.action");
+const structureActioner = require("structure.action");
+const memory = require("util.memory");
+const { allCreeps, findHostileCreeps } = require("./util.creep");
 
 const isWall = (room, point) =>
     _.some(
@@ -49,6 +51,7 @@ const initSourceInfo = (room) => {
         for (var s in sources) {
             var source = sources[s];
             sourceInfo.push({
+                room,
                 source,
                 limit: findSourceLimit(room, source),
             });
@@ -63,17 +66,27 @@ const init = (room) => {
 };
 
 module.exports.loop = function () {
-    //get the room we are in
-    const room = Game.spawns["Spawn1"].room;
-
-    init(room);
-
     //flush memory
     memory.flush();
 
-    //manager controls the creation and removal of screeps dependent on our current needs
-    manager.run(room);
+    for (var name in Game.rooms) {
+        const room = Game.rooms[name];
 
-    //creep actioner runs all the creeps, decides when actions needs to change
-    actioner.run();
+        init(room);
+
+        //manager controls the creation and removal of screeps dependent on our current needs
+        manager.run(room);
+
+        //action all structures
+        structureActioner.run(room);
+
+        //creep actioner runs all the creeps, decides when actions needs to change
+        creepActioner.run(room);
+    }
+    //console.log(_.map(Game.rooms, (n) => n.name));
+    //const rooms = _.uniq(_.map(room.find(FIND_MY_CREEPS), (c) => c.room.name));
+
+    // console.log(rooms);
+    //get the room we are in
+    //const room = Game.spawns["Spawn1"].room;
 };

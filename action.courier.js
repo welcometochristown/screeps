@@ -1,4 +1,6 @@
-const { closest } = require("./util.geography");
+const { closest, closestEnergyStorage } = require("./util.geography");
+const { spawnEnergyCapacity, energyStored } = require("./util.resource");
+const { targetedAt } = require("./util.social");
 
 const courier = (creep) => {
     if (creep.carry.energy > 0) {
@@ -15,7 +17,23 @@ const courier = (creep) => {
             return;
         }
 
-        //spawns with space
+        //only fill turrets if we have enough energy to fill the spawn structure (SPAWN, EXTENSION)
+        if (energyStored(creep.room) > spawnEnergyCapacity(creep.room)) {
+            //load towers too
+            const towers = creep.room.find(FIND_MY_STRUCTURES, {
+                filter: (structure) =>
+                    structure.structureType == STRUCTURE_TOWER &&
+                    structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
+            });
+
+            if (towers.length) {
+                creep.memory.target = closest(creep, towers);
+                creep.memory.action = "transfer";
+                return;
+            }
+        }
+
+        //extensions with space
         const extensions = creep.room.find(FIND_MY_STRUCTURES, {
             filter: (structure) =>
                 structure.structureType == STRUCTURE_EXTENSION &&
@@ -29,11 +47,13 @@ const courier = (creep) => {
         }
     }
 
+    //TODO : keeps getting -7 errors. no idea why
     // const droppedEnergy = creep.room.find(FIND_DROPPED_RESOURCES, {
     //     filter: { resourceType: RESOURCE_ENERGY },
     // });
 
     // if (droppedEnergy.length > 0) {
+    //     console.log("picking up dropped energy ");
     //     var target = closest(creep, droppedEnergy);
     //     creep.memory.target = target;
     //     creep.memory.action = "pickup";
@@ -41,24 +61,23 @@ const courier = (creep) => {
     // }
 
     const tombStones = creep.room.find(FIND_TOMBSTONES, {
-        filter: (tombstone) => tombstone.store[RESOURCE_ENERGY] > 0,
+        filter: (tombstone) =>
+            tombstone.store[RESOURCE_ENERGY] > 0 &&
+            targetedAt(tombstone).length == 0,
     });
 
-    if (tombStones.length > 0) {
-        var target = closest(creep, tombStones);
-        creep.memory.target = target;
+    //TODO: add check so only one courier goes to tombstones
+    if (tombStones.length) {
+        console.log("picking up tombstone energy");
+        creep.memory.target = closest(tombStones);
         creep.memory.action = "withdraw";
         return;
     }
 
-    const containers = creep.room.find(FIND_STRUCTURES, {
-        filter: (structure) =>
-            structure.structureType == STRUCTURE_CONTAINER &&
-            structure.store[RESOURCE_ENERGY] > 0,
-    });
+    const closestStore = closestEnergyStorage(creep);
 
-    if (containers.length) {
-        creep.memory.target = closest(creep, containers);
+    if (closestStore) {
+        creep.memory.target = closestStore;
         creep.memory.action = "withdraw";
         return;
     }

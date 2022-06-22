@@ -1,5 +1,8 @@
-const closest = (creep, targets) => {
-    return _.sortBy(targets, (s) => creep.pos.getRangeTo(s))[0];
+const closest = (object, targets) => {
+    if (!targets) return undefined;
+    if (targets.length == 0) return undefined;
+    if (targets.length == 1) return targets[0];
+    return _.sortBy(targets, (s) => object.pos.getRangeTo(s))[0];
 };
 
 const getEnergyStructures = (room, filter) => {
@@ -45,22 +48,28 @@ module.exports = {
         return closest(creep, energyStructures);
     },
 
-    //closest place to withdraw energy
-    closestEnergyStorage: (creep, ignoreSpawn = false) => {
+    //closest energy storage place to withdraw energy
+    closestEnergyStorage: (creep) => {
         var energyStructures = getEnergyStructures(
             creep.room,
-            (s) => s.store[RESOURCE_ENERGY] > 1
+            (s) =>
+                (s.structureType == STRUCTURE_CONTAINER ||
+                    s.structureType == STRUCTURE_STORAGE) &&
+                s.store[RESOURCE_ENERGY] > 1
         );
-
-        //filter to only non spawns if the list contains any
-        if (ignoreSpawn && containsSpawns(energyStructures)) {
-            energyStructures = _.filter(
-                energyStructures,
-                (s) => s.structureType != STRUCTURE_SPAWN
-            );
-        }
 
         return closest(creep, energyStructures);
     },
+    //construction sites in same room as creep, or spawns to be constructed in other rooms
+    allConstructionSites: (creep) =>
+        _.flatten(
+            _.map(Game.rooms, (r) =>
+                !creep || creep.room.name == r.name
+                    ? r.find(FIND_MY_CONSTRUCTION_SITES)
+                    : r.find(FIND_MY_CONSTRUCTION_SITES, {
+                          filter: { structureType: STRUCTURE_SPAWN },
+                      })
+            )
+        ),
     closest,
 };
