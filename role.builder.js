@@ -7,14 +7,14 @@ const nonRoadCount = (sites) =>
     Math.ceil(_.filter(sites, (s) => s.structureType != STRUCTURE_ROAD).length);
 
 const getAction = (creep) => {
-    if (!allConstructionSites(creep).length) {
+    if (!allConstructionSites(creep.room).length) {
         return "suicide";
     }
 
     return "build";
 };
 
-const minRequired = (room, sites = allConstructionSites()) =>
+const minRequired = (room, sites = allConstructionSites(room)) =>
     Math.ceil((roadCount(sites) / 10 + nonRoadCount(sites)) / 10);
 
 module.exports = {

@@ -20,7 +20,7 @@ const build = (creep) => {
         return;
     }
 
-    const sites = allConstructionSites(creep);
+    const sites = allConstructionSites(creep.room);
 
     const prioritisedSites = filterByPriority(
         sites,

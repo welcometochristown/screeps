@@ -1,5 +1,5 @@
 const { closest, closestEnergyStorage } = require("./util.geography");
-const { spawnEnergyCapacity, energyStored } = require("./util.resource");
+const { energyCapacity, energyStored } = require("./util.resource");
 const { targetedAt } = require("./util.social");
 
 const courier = (creep) => {
@@ -18,7 +18,10 @@ const courier = (creep) => {
         }
 
         //only fill turrets if we have enough energy to fill the spawn structure (SPAWN, EXTENSION)
-        if (energyStored(creep.room) > spawnEnergyCapacity(creep.room)) {
+        if (
+            energyStored(creep.room) >
+            energyCapacity(creep.room, [STRUCTURE_SPAWN, STRUCTURE_EXTENSION])
+        ) {
             //load towers too
             const towers = creep.room.find(FIND_MY_STRUCTURES, {
                 filter: (structure) =>
@@ -68,7 +71,6 @@ const courier = (creep) => {
 
     //TODO: add check so only one courier goes to tombstones
     if (tombStones.length) {
-        console.log("picking up tombstone energy");
         creep.memory.target = closest(tombStones);
         creep.memory.action = "withdraw";
         return;

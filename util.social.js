@@ -9,24 +9,17 @@ const modules = {
 
 module.exports = {
     //return all creeps that are targeting this structure
-    targetedAt: (object) => {
-        var creeps = _.forEach(Game.creeps, (name) => Game.creeps[name]);
-        return _.filter(
-            creeps,
+    targetedAt: (object) =>
+        _.filter(
+            Game.creeps,
             (creep) =>
                 creep.memory.target && creep.memory.target.id == object.id
-        );
-    },
-    harvesters: () => {
-        var creeps = _.forEach(Game.creeps, (name) => Game.creeps[name]);
-        return _.filter(creeps, (creep) => creep.memory.role == "harvester");
-    },
+        ),
     roles: () => {
         return _.map(modules, (m) => m.role);
     },
-    getCreepsByRole: (role) => {
-        return _.filter(Game.creeps, (c) => c.memory.role == role);
-    },
+    getCreepsByRole: (room, role) =>
+        room.find(FIND_MY_CREEPS, { filter: (c) => c.memory.role == role }),
     getModuleByRole: (role) => {
         return _.filter(modules, (m) => m.role == role)[0];
     },

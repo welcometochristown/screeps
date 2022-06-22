@@ -61,10 +61,10 @@ module.exports = {
         return closest(creep, energyStructures);
     },
     //construction sites in same room as creep, or spawns to be constructed in other rooms
-    allConstructionSites: (creep) =>
+    allConstructionSites: (room) =>
         _.flatten(
             _.map(Game.rooms, (r) =>
-                !creep || creep.room.name == r.name
+                !room || room.name == r.name
                     ? r.find(FIND_MY_CONSTRUCTION_SITES)
                     : r.find(FIND_MY_CONSTRUCTION_SITES, {
                           filter: { structureType: STRUCTURE_SPAWN },

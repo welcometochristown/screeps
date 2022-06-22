@@ -22,13 +22,13 @@ const action = (creep) => {
 
     //if an action was found, broadcast what the creep is doing, then do the action
     if (action) {
-        if (creep.memory.role == "builder") {
-            creep.say(
-                `${creep.memory.action} ${
-                    creep.memory.target ? creep.memory.target.id : ""
-                }`
-            );
-        }
+        // if (creep.memory.role == "builder") {
+        //     creep.say(
+        //         `${creep.memory.action} ${
+        //             creep.memory.target ? creep.memory.target.id : ""
+        //         }`
+        //     );
+        // }S
 
         action.run(creep);
     }

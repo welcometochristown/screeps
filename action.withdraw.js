@@ -36,9 +36,13 @@ const withdraw = (creep, resource = RESOURCE_ENERGY) => {
                 creep.store.getFreeCapacity(RESOURCE_ENERGY),
                 storedEnergy * 0.1
             ); // only 10% max for upgrading
+
+            amount = Math.min(
+                amount,
+                target.store.getUsedCapacity(RESOURCE_ENERGY)
+            );
         }
 
-        //dont allow withdrawal while attempting to spawn new creeps, harvest its own energy
         const result = creep.withdraw(target, resource, amount);
 
         if (result == ERR_NOT_IN_RANGE) {

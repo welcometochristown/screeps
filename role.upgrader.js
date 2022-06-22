@@ -6,7 +6,7 @@ const getAction = (creep) => {
 
 const minRequired = (room) => {
     if (!room.controller) return 0;
-    return Math.max(Math.floor(energyStored(room) / 3000), 1);
+    return Math.max(Math.floor(energyStored(room) / 25000), 1);
 };
 
 module.exports = {

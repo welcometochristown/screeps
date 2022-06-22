@@ -1,30 +1,28 @@
-const energyStored = (room) =>
+const energyStored = (
+    room,
+    structureTypes = [STRUCTURE_CONTAINER, STRUCTURE_STORAGE]
+) =>
     _.sum(
         room.find(FIND_STRUCTURES, {
-            filter: { structureType: STRUCTURE_CONTAINER },
+            filter: (s) => structureTypes.includes(s.structureType),
         }),
         (s) => s.store[RESOURCE_ENERGY]
     );
 
-const energyCapacity = (room) =>
+const energyCapacity = (
+    room,
+    structureTypes = [STRUCTURE_CONTAINER, STRUCTURE_STORAGE]
+) =>
     _.sum(
         room.find(FIND_STRUCTURES, {
-            filter: { structureType: STRUCTURE_CONTAINER },
+            filter: (s) => structureTypes.includes(s.structureType),
         }),
         (s) => s.store.getCapacity(RESOURCE_ENERGY)
     );
 
-const spawnEnergyCapacity = (room) =>
-    _.sum(
-        room.find(FIND_STRUCTURES, {
-            filter: (s) => s.structureType == STRUCTURE_SPAWN,
-        }),
-        (s) => s.store.getCapacity(RESOURCE_ENERGY)
-    );
-
-const storedEnergyPercentage = (room) => {
-    const capacity = energyCapacity(room);
-    const stored = energyStored(room);
+const energyStoredPercentage = (room, structureTypes) => {
+    const capacity = energyCapacity(room, structureTypes);
+    const stored = energyStored(room, structureTypes);
 
     return capacity == 0 ? 0 : stored / capacity;
 };
@@ -32,6 +30,5 @@ const storedEnergyPercentage = (room) => {
 module.exports = {
     energyStored,
     energyCapacity,
-    storedEnergyPercentage,
-    spawnEnergyCapacity,
+    energyStoredPercentage,
 };

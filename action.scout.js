@@ -1,20 +1,36 @@
 const scout = (creep) => {
-    creep.suicide();
-    const room = "W55N33";
+    const flag = _.filter(
+        Game.flags,
+        (f) => f.name.toLowerCase() == "capture"
+    )[0];
 
-    if (room) {
-        if (creep.room.name != room) {
-            creep.moveTo(new RoomPosition(5, 35, room), { maxOps: 500 });
+    if (flag) {
+        if (!flag.room || creep.room.name != flag.room.name) {
+            creep.moveTo(flag, {
+                maxOps: 500,
+            });
         } else {
             const controller = creep.room.find(FIND_STRUCTURES, {
                 filter: { structureType: STRUCTURE_CONTROLLER },
             })[0];
 
-            if (controller.owner.username != "thunderbeans") {
+            if (!controller) return;
+
+            if (
+                !controller.owner ||
+                controller.owner.username != "thunderbeans"
+            ) {
                 if (creep.claimController(controller) == ERR_NOT_IN_RANGE) {
                     console.log("moving to room controller");
                     creep.moveTo(controller);
                 }
+            }
+
+            if (
+                controller.owner &&
+                controller.owner.username == "thunderbeans"
+            ) {
+                flag.remove();
             }
         }
     }
