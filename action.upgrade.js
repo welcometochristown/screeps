@@ -1,6 +1,6 @@
 const { isWorker } = require("util.creep");
 
-const upgrade = (creep) => {
+const upgrade = (creep, room) => {
     if (!isWorker(creep)) {
         creep.memory.target = undefined;
         creep.memory.action = undefined;
@@ -13,7 +13,7 @@ const upgrade = (creep) => {
         return;
     }
 
-    creep.memory.target = creep.room.controller;
+    creep.memory.target = room.controller;
 
     if (creep.upgradeController(creep.memory.target) == ERR_NOT_IN_RANGE) {
         creep.moveTo(creep.memory.target);

@@ -1,7 +1,7 @@
 const { closestEnergyTransfer } = require("util.geography");
 const { getModuleByRole } = require("./util.social");
 
-const transfer = (creep) => {
+const transfer = (creep, room) => {
     //transfer complete, ready for new action
     if (creep.carry.energy == 0) {
         creep.memory.action = undefined;

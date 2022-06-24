@@ -10,6 +10,7 @@ module.exports = {
         //how big can we make it with energy
         var size = _.floor(energy / basic_cost);
 
+        //limit the amount of times we increase it based on sizeLimit
         if (sizeLimit > 0) {
             size = Math.min(sizeLimit, size);
         }
@@ -19,27 +20,32 @@ module.exports = {
             body = body.concat([...blueprint]);
         }
 
-        while (true) {
-            var new_cost = cost(body);
-            var remaining = energy - new_cost;
+        // console.log(
+        //     `basic_cost = ${basic_cost}, energy = ${energy} size=${size}, body=${body}`
+        // );
 
-            //TODO : this always takes the first instance of 100 or 50 it should pop each one then reset
-            var spare_parts = _.sortBy(
-                _.filter(
-                    _.map(parts, (p, k) => ({ key: k, value: p })),
-                    (n) =>
-                        blueprint.includes(n.key.toLowerCase()) &&
-                        n.value < remaining
-                ),
-                (m) => -m.value
-            );
+        // while (true) {
+        //     var new_cost = cost(body);
+        //     var remaining = energy - new_cost;
 
-            if (spare_parts.length == 0) {
-                break;
-            }
+        //     //TODO : this always takes the first instance of 100 or 50 it should pop each one then reset
+        //     var spare_parts = _.sortBy(
+        //         _.filter(
+        //             _.map(parts, (p, k) => ({ key: k, value: p })),
+        //             (n) =>
+        //                 blueprint.includes(n.key.toLowerCase()) &&
+        //                 n.value < remaining
+        //         ),
+        //         (m) => -m.value
+        //     );
 
-            body = body.concat(spare_parts[0].key.toLowerCase());
-        }
+        //     if (spare_parts.length == 0) {
+        //         break;
+        //     }
+
+        //     body = body.concat(spare_parts[0].key.toLowerCase());
+        // }
+
         return body;
     },
 };

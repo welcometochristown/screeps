@@ -1,4 +1,4 @@
-const scout = (creep) => {
+const scout = (creep, room) => {
     const flag = _.filter(
         Game.flags,
         (f) => f.name.toLowerCase() == "capture"

@@ -5,6 +5,7 @@ const modules = {
     repairer: require("role.repairer"),
     courier: require("role.courier"),
     scout: require("role.scout"),
+    miner: require("role.miner"),
 };
 
 module.exports = {
@@ -18,8 +19,21 @@ module.exports = {
     roles: () => {
         return _.map(modules, (m) => m.role);
     },
-    getCreepsByRole: (room, role) =>
-        room.find(FIND_MY_CREEPS, { filter: (c) => c.memory.role == role }),
+    //find creeps by the room they were spawned in
+    getCreepsByRole: (spawnRoom, role) =>
+        _.filter(
+            Game.creeps,
+            (creep) =>
+                creep.owner.username == "thunderbeans" &&
+                creep.memory.role == role &&
+                creep.memory.spawnRoom == spawnRoom.name
+        ),
+    //find creeps by the room they are in now
+    getCreepsByRoleInRoom: (room, role) =>
+        room.find(FIND_MY_CREEPS, {
+            filter: (creep) => creep.memory.role == role,
+        }),
+
     getModuleByRole: (role) => {
         return _.filter(modules, (m) => m.role == role)[0];
     },

@@ -3,8 +3,11 @@ const { closest } = require("util.geography");
 const { isWorker } = require("util.creep");
 
 const isSourceFull = (source) => {
-    //get source information (i.e limit)
-    var sourceInfo = Memory.sourceInfo.find((i) => i.source.id === source.id);
+    //get room info memory object
+    var roomInfo = Memory.rooms.find((i) => i.room.name == source.room.name);
+
+    //info about the source
+    var sourceInfo = roomInfo.sources.find((i) => i.source.id == source.id);
 
     //current count of creeps working on this source
     var creepCount = targetedAt(source).length;
@@ -12,14 +15,14 @@ const isSourceFull = (source) => {
     return creepCount >= sourceInfo.limit;
 };
 
-const harvest = (creep) => {
+const harvest = (creep, room) => {
     if (!isWorker(creep)) {
         creep.memory.target = undefined;
         creep.memory.action = undefined;
         return;
     }
 
-    var sources = creep.room.find(FIND_SOURCES, {
+    var sources = room.find(FIND_SOURCES, {
         filter: (source) => source.energy > 0,
     });
 
@@ -27,18 +30,18 @@ const harvest = (creep) => {
         var closestSource = closest(creep, sources);
 
         //TODO: Update to work with multiple rooms
-        // while (sources.length) {
-        //     //get the next closest source
-        //     var source = closest(creep, sources);
+        while (sources.length) {
+            //get the next closest source
+            var source = closest(creep, sources);
 
-        //     //if source is full, remove from list and lets go again
-        //     if (isSourceFull(source)) {
-        //         sources = _.filter(sources, (s) => s.id !== source.id);
-        //     } else {
-        //         closestSource = source;
-        //         break;
-        //     }
-        // }
+            //if source is full, remove from list and lets go again
+            if (isSourceFull(source)) {
+                sources = _.filter(sources, (s) => s.id !== source.id);
+            } else {
+                closestSource = source;
+                break;
+            }
+        }
 
         creep.memory.target = closestSource;
     }

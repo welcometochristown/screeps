@@ -1,7 +1,7 @@
 const { closest } = require("util.geography");
 const { isWorker } = require("util.creep");
 
-const repair = (creep) => {
+const repair = (creep, room) => {
     if (!isWorker(creep)) {
         creep.memory.target = undefined;
         creep.memory.action = undefined;
@@ -14,7 +14,7 @@ const repair = (creep) => {
         return;
     }
 
-    const targets = creep.room.find(FIND_STRUCTURES, {
+    const targets = room.find(FIND_STRUCTURES, {
         filter: (object) =>
             object.hits < object.hitsMax &&
             object.structureType != STRUCTURE_WALL,

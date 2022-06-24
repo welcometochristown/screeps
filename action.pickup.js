@@ -1,4 +1,4 @@
-const pickup = (creep) => {
+const pickup = (creep, room) => {
     if (creep.memory.target) {
         var target = Game.getObjectById(creep.memory.target.id);
         const result = creep.pickup(target, RESOURCE_ENERGY);

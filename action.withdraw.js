@@ -2,7 +2,7 @@ const { closestEnergyStorage } = require("util.geography");
 const { isWorker } = require("util.creep");
 const { energyStored } = require("util.resource");
 
-const withdraw = (creep, resource = RESOURCE_ENERGY) => {
+const withdraw = (creep, room, resource = RESOURCE_ENERGY) => {
     //withdrawal complete, ready for new action
     if (creep.store.getFreeCapacity(resource) == 0) {
         creep.memory.action = undefined;
@@ -10,15 +10,15 @@ const withdraw = (creep, resource = RESOURCE_ENERGY) => {
         return;
     }
 
-    //if there is nothing in the spawn build queue
     var target = undefined;
 
     if (creep.memory.target) {
         //get the target
         target = Game.getObjectById(creep.memory.target.id);
-
         //check whether the target has any energy
-        if (!target || target.store[resource] == 0) target = undefined;
+        if (!target || target.store[resource] == 0) {
+            target = undefined;
+        }
     }
 
     if (!target) {
@@ -28,7 +28,7 @@ const withdraw = (creep, resource = RESOURCE_ENERGY) => {
 
     //if we found one, then move to it and withdraw
     if (target) {
-        const storedEnergy = energyStored(creep.room);
+        const storedEnergy = energyStored(room);
         var amount = 0; //as much as possible
 
         if (creep.memory.role == "upgrader") {

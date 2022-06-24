@@ -1,4 +1,4 @@
-const suicide = (creep) => {
+const suicide = (creep, room) => {
     //dont kill creeps with energy
     if (creep.carry.energy != 0) {
         creep.memory.action = "transfer";

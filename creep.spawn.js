@@ -21,7 +21,12 @@ module.exports = {
         );
 
         //dont have enough to create this body, then quit
-        if (available < cost(body)) return;
+        if (available < cost(body)) {
+            // console.log("not enough energy");
+            return;
+        }
+
+        console.log(`spawning ${role} in ${room.name}`);
 
         //find all spawns in our room
         var spawns = room.find(FIND_MY_STRUCTURES, {
@@ -34,7 +39,7 @@ module.exports = {
 
             //spawn the new creep
             spawns[i].spawnCreep(body, makeName(role), {
-                memory: { role: role },
+                memory: { role: role, spawnRoom: room.name },
             });
 
             break;

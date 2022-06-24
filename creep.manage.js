@@ -9,12 +9,20 @@ const register = [
     { priority: 0, module: modules.harvester, sizeLimit: 0 },
     { priority: 1, module: modules.upgrader, sizeLimit: 0 },
     { priority: 2, module: modules.builder, sizeLimit: 0 },
-    { priority: 3, module: modules.courier, sizeLimit: 3 },
-    { priority: 4, module: modules.repairer, sizeLimit: 2 },
-    { priority: 5, module: modules.scout, sizeLimit: 0 },
+    { priority: 3, module: modules.courier, sizeLimit: 2 },
+    { priority: 4, module: modules.repairer, sizeLimit: 1 },
+    { priority: 5, module: modules.miner, sizeLimit: 0 },
+    { priority: 6, module: modules.scout, sizeLimit: 1 },
 ];
 
+//false for disabled
 const PAUSE_SPAWNING = false;
+
+// 0 for disabled
+const GLOBAL_SIZE_LIMIT = 3;
+
+//-1 for disabled
+const FIXED_RATIO = 0.5;
 
 //spawn each role one at a time, in priority order
 const nextSpawn = (room) => {
@@ -27,6 +35,10 @@ const nextSpawn = (room) => {
 
         //how many creeps do we have of this role in this room currently?
         var actualCreeps = _.size(getCreepsByRole(room, item.module.role));
+
+        // console.log(
+        //     `${room.name} ${item.module.role} ${actualCreeps}/${requiredCreeps}`
+        // );
 
         //do we already have enough assigned for this role?
         if (actualCreeps >= requiredCreeps) continue;
@@ -43,27 +55,40 @@ module.exports = {
     run: (room, next = nextSpawn(room)) => {
         if (PAUSE_SPAWNING || !next) return;
 
-        console.log(`next build in ${room.name}: ${next.module.role}`);
+        //console.log(`next build in ${room.name}: ${next.module.role}`);
 
         const couriers = getCreepsByRole(room, "courier").length;
         const minCouriers = minCouriersRequired(room);
 
-        const ratio = couriers == 0 ? 0 : minCouriers / couriers; //ratio the amount we consider 'full' extensions based on the amount of couriers we have working
+        const ratio =
+            FIXED_RATIO > -1
+                ? FIXED_RATIO
+                : minCouriers == 0
+                ? 0
+                : couriers / minCouriers;
+
         const extensionCapacity = energyCapacity(room, [STRUCTURE_EXTENSION]);
-        const extensionCapacityRatioed = extensionCapacity * ratio;
+        const extensionCapacityRatioed = extensionCapacity * ratio; //extension capacity we want to used based on how many couriers we have
+
         const extensionStored = energyStored(room, [STRUCTURE_EXTENSION]);
         const storedEnergy = energyStored(room);
 
         //are extensions full enough?
         if (extensionStored < extensionCapacityRatioed) {
-            //if we have enough energy stored, and couriers to transfer it
+            //if we have enough energy stored
             if (storedEnergy > extensionCapacityRatioed) {
+                // console.log(
+                //     `${room.name} waiting for extensions to fill - ${extensionStored} < ${extensionCapacityRatioed} (${extensionCapacity}) via ratio ${ratio} (${minCouriers} / ${couriers})`
+                // );
                 return; //wait
             }
         }
 
-        return !next
-            ? null
-            : spawner.spawnCreep(room, next.module.role, next.sizeLimit);
+        const size =
+            GLOBAL_SIZE_LIMIT > 0
+                ? Math.min(GLOBAL_SIZE_LIMIT, next.sizeLimit)
+                : next.sizeLimit;
+
+        return !next ? null : spawner.spawnCreep(room, next.module.role, size);
     },
 };

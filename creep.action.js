@@ -12,31 +12,51 @@ const actions = {
     courier: require("action.courier"),
     pickup: require("action.pickup"),
     scout: require("action.scout"),
+    miner: require("action.mine"),
 };
 
 const getByAction = (action) => _.filter(actions, (a) => a.action == action)[0];
 
 const action = (creep) => {
+    // if (creep.memory.role == "miner") {
+    //     creep.memory.action = undefined;
+    //     creep.memory.target = undefined;
+    // }
+
     //find the action function the creep currently has in memory
     const action = getByAction(creep.memory.action);
 
     //if an action was found, broadcast what the creep is doing, then do the action
     if (action) {
-        // if (creep.memory.role == "builder") {
-        //     creep.say(
-        //         `${creep.memory.action} ${
-        //             creep.memory.target ? creep.memory.target.id : ""
-        //         }`
-        //     );
-        // }S
+        if (creep.memory.role == "miner") {
+            creep.say(
+                `${creep.memory.action} ${
+                    creep.memory.target ? creep.memory.target.id : ""
+                }`
+            );
+        }
 
-        action.run(creep);
+        //creeps should only work in the room they were spawned in
+        const room = Game.rooms[creep.memory.spawnRoom];
+
+        action.run(creep, room);
     }
     //otherwise find the action the creep should be doing based on its role
     else {
         var module = getModuleByRole(creep.memory.role);
         creep.memory.action = module.getAction(creep);
     }
+
+    //say hello lol
+    // if (
+    //     creep.room.find(FIND_MY_CREEPS, {
+    //         filter: (c) =>
+    //             creep.room.findPath(creep.pos, c.pos, { maxOps: 10 }).length ==
+    //             1,
+    //     }).length
+    // ) {
+    //     creep.say("✋");
+    // }
 };
 
 module.exports = {

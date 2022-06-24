@@ -3,7 +3,7 @@ const { isWorker } = require("util.creep");
 const { filterByPriority } = require("util.common");
 const { allConstructionSites } = require("util.geography");
 
-const build = (creep) => {
+const build = (creep, room) => {
     if (!isWorker(creep)) {
         creep.memory.target = undefined;
         creep.memory.action = undefined;
@@ -20,7 +20,7 @@ const build = (creep) => {
         return;
     }
 
-    const sites = allConstructionSites(creep.room);
+    const sites = allConstructionSites(room);
 
     const prioritisedSites = filterByPriority(
         sites,

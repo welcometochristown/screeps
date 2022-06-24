@@ -1,11 +1,15 @@
 const { closest, closestEnergyStorage } = require("./util.geography");
-const { energyCapacity, energyStored } = require("./util.resource");
+const {
+    energyCapacity,
+    energyStored,
+    energyStoredPercentage,
+} = require("./util.resource");
 const { targetedAt } = require("./util.social");
 
-const courier = (creep) => {
+const courier = (creep, room) => {
     if (creep.carry.energy > 0) {
         //spawns with space
-        const spawns = creep.room.find(FIND_MY_STRUCTURES, {
+        const spawns = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) =>
                 structure.structureType == STRUCTURE_SPAWN &&
                 structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
@@ -17,13 +21,14 @@ const courier = (creep) => {
             return;
         }
 
-        //only fill turrets if we have enough energy to fill the spawn structure (SPAWN, EXTENSION)
+        //only fill turrets if we have enough energy to fill the spawn structure (SPAWN, EXTENSION) or there are hostile creeps in the same room
         if (
-            energyStored(creep.room) >
-            energyCapacity(creep.room, [STRUCTURE_SPAWN, STRUCTURE_EXTENSION])
+            energyStored(room) >
+                energyCapacity(room, [STRUCTURE_SPAWN, STRUCTURE_EXTENSION]) ||
+            room.find(FIND_HOSTILE_CREEPS).length
         ) {
             //load towers too
-            const towers = creep.room.find(FIND_MY_STRUCTURES, {
+            const towers = room.find(FIND_MY_STRUCTURES, {
                 filter: (structure) =>
                     structure.structureType == STRUCTURE_TOWER &&
                     structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
@@ -37,7 +42,7 @@ const courier = (creep) => {
         }
 
         //extensions with space
-        const extensions = creep.room.find(FIND_MY_STRUCTURES, {
+        const extensions = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) =>
                 structure.structureType == STRUCTURE_EXTENSION &&
                 structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
@@ -48,10 +53,23 @@ const courier = (creep) => {
             creep.memory.action = "transfer";
             return;
         }
+
+        //put everything else in the main storage
+        const storages = room.find(FIND_MY_STRUCTURES, {
+            filter: (structure) =>
+                structure.structureType == STRUCTURE_STORAGE &&
+                structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
+        });
+
+        if (storages.length) {
+            creep.memory.target = closest(creep, storages);
+            creep.memory.action = "transfer";
+            return;
+        }
     }
 
     //TODO : keeps getting -7 errors. no idea why
-    // const droppedEnergy = creep.room.find(FIND_DROPPED_RESOURCES, {
+    // const droppedEnergy = room.find(FIND_DROPPED_RESOURCES, {
     //     filter: { resourceType: RESOURCE_ENERGY },
     // });
 
@@ -63,20 +81,35 @@ const courier = (creep) => {
     //     return;
     // }
 
-    const tombStones = creep.room.find(FIND_TOMBSTONES, {
+    const tombStones = room.find(FIND_TOMBSTONES, {
         filter: (tombstone) =>
             tombstone.store[RESOURCE_ENERGY] > 0 &&
             targetedAt(tombstone).length == 0,
     });
-
-    //TODO: add check so only one courier goes to tombstones
     if (tombStones.length) {
-        creep.memory.target = closest(tombStones);
+        creep.memory.target = closest(creep, tombStones);
         creep.memory.action = "withdraw";
         return;
     }
 
-    const closestStore = closestEnergyStorage(creep);
+    const ruins = room.find(FIND_RUINS, {
+        filter: (ruin) =>
+            ruin.store[RESOURCE_ENERGY] > 0 && targetedAt(ruin).length == 0,
+    });
+
+    if (ruins.length) {
+        creep.memory.target = closest(creep, ruins);
+        creep.memory.action = "withdraw";
+        return;
+    }
+
+    const spawnEnergyFull =
+        energyStoredPercentage(room, [STRUCTURE_SPAWN, STRUCTURE_EXTENSION]) ==
+        1;
+    const closestStore = closestEnergyStorage(
+        creep,
+        spawnEnergyFull ? [STRUCTURE_CONTAINER] : []
+    );
 
     if (closestStore) {
         creep.memory.target = closestStore;
