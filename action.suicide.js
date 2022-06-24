@@ -1,6 +1,6 @@
 const suicide = (creep, room) => {
     //dont kill creeps with energy
-    if (creep.carry.energy != 0) {
+    if (creep.store[RESOURCE_ENERGY] != 0) {
         creep.memory.action = "transfer";
         creep.memory.target = undefined;
         return;

@@ -1,13 +1,9 @@
 const { closest, closestEnergyStorage } = require("./util.geography");
-const {
-    energyCapacity,
-    energyStored,
-    energyStoredPercentage,
-} = require("./util.resource");
+const { energyStoredPercentage } = require("./util.resource");
 const { targetedAt } = require("./util.social");
 
 const courier = (creep, room) => {
-    if (creep.carry.energy > 0) {
+    if (creep.store[RESOURCE_ENERGY] > 0) {
         //spawns with space
         const spawns = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) =>
@@ -21,26 +17,6 @@ const courier = (creep, room) => {
             return;
         }
 
-        //only fill turrets if we have enough energy to fill the spawn structure (SPAWN, EXTENSION) or there are hostile creeps in the same room
-        if (
-            energyStored(room) >
-                energyCapacity(room, [STRUCTURE_SPAWN, STRUCTURE_EXTENSION]) ||
-            room.find(FIND_HOSTILE_CREEPS).length
-        ) {
-            //load towers too
-            const towers = room.find(FIND_MY_STRUCTURES, {
-                filter: (structure) =>
-                    structure.structureType == STRUCTURE_TOWER &&
-                    structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
-            });
-
-            if (towers.length) {
-                creep.memory.target = closest(creep, towers);
-                creep.memory.action = "transfer";
-                return;
-            }
-        }
-
         //extensions with space
         const extensions = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) =>
@@ -50,6 +26,19 @@ const courier = (creep, room) => {
 
         if (extensions.length) {
             creep.memory.target = closest(creep, extensions);
+            creep.memory.action = "transfer";
+            return;
+        }
+
+        //load towers too
+        const towers = room.find(FIND_MY_STRUCTURES, {
+            filter: (structure) =>
+                structure.structureType == STRUCTURE_TOWER &&
+                structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
+        });
+
+        if (towers.length) {
+            creep.memory.target = closest(creep, towers);
             creep.memory.action = "transfer";
             return;
         }
@@ -118,7 +107,7 @@ const courier = (creep, room) => {
     }
 
     creep.memory.target = undefined;
-    creep.memory.action = undefined;
+    creep.memory.action = "wait";
 };
 
 module.exports = {

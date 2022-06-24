@@ -15,6 +15,8 @@ const withdraw = (creep, room, resource = RESOURCE_ENERGY) => {
     if (creep.memory.target) {
         //get the target
         target = Game.getObjectById(creep.memory.target.id);
+
+        //TODO : determine resource type by the target type (i.e mineral vs energy)
         //check whether the target has any energy
         if (!target || target.store[resource] == 0) {
             target = undefined;

@@ -21,7 +21,7 @@ const getAction = (creep) => {
     }
 
     //transfer any energy we are carrying
-    if (creep.carry.energy > 0) {
+    if (creep.store[RESOURCE_ENERGY] > 0) {
         return "transfer";
     }
 

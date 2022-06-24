@@ -1,3 +1,14 @@
+const minerals = [
+    RESOURCE_HYDROGEN,
+    RESOURCE_OXYGEN,
+    RESOURCE_UTRIUM,
+    RESOURCE_LEMERGIUM,
+    RESOURCE_KEANIUM,
+    RESOURCE_ZYNTHIUM,
+    RESOURCE_CATALYST,
+    RESOURCE_GHODIUM,
+];
+
 const energyStored = (
     room,
     structureTypes = [STRUCTURE_CONTAINER, STRUCTURE_STORAGE]
@@ -31,4 +42,5 @@ module.exports = {
     energyStored,
     energyCapacity,
     energyStoredPercentage,
+    minerals,
 };

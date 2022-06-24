@@ -76,6 +76,17 @@ const findSourceLimit = (room, source) => {
 module.exports = {
     isWall,
     findSourceLimit,
+    closestMineralTransfer: (creep) => {
+        var storages = creep.room.find(FIND_MY_STRUCTURES, {
+            filter: (structure) =>
+                structure.structureType == STRUCTURE_STORAGE &&
+                _.sum(minerals, (mineral) => structure.store[mineral]) /
+                    structure.store.getCapacity() <=
+                    0.5, //store if there is less than 50% of space used by minerals
+        });
+
+        return closest(creep, storages);
+    },
     //closest place to transfer energy to that has availability
     closestEnergyTransfer: (
         creep,

@@ -7,7 +7,7 @@ const upgrade = (creep, room) => {
         return;
     }
 
-    if (creep.carry.energy == 0) {
+    if (creep.store[RESOURCE_ENERGY] == 0) {
         creep.memory.action = "withdraw";
         creep.memory.target = undefined;
         return;
@@ -20,7 +20,7 @@ const upgrade = (creep, room) => {
     }
 
     //upgrade complete, ready for new action
-    if (creep.carry.energy == 0) {
+    if (creep.store[RESOURCE_ENERGY] == 0) {
         creep.memory.action = undefined;
         creep.memory.target = undefined;
     }

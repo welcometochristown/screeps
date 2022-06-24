@@ -8,7 +8,7 @@ const repair = (creep, room) => {
         return;
     }
 
-    if (creep.carry.energy == 0) {
+    if (creep.store[RESOURCE_ENERGY] == 0) {
         creep.memory.action = "withdraw";
         creep.memory.target = undefined;
         return;

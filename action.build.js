@@ -11,7 +11,7 @@ const build = (creep, room) => {
     }
 
     //if we have no energy to build, time to withdraw some
-    if (creep.carry.energy == 0) {
+    if (creep.store[RESOURCE_ENERGY] == 0) {
         creep.memory.action =
             creep.memory.role == "builder" || "repairer"
                 ? "withdraw"

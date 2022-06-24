@@ -11,7 +11,7 @@ const register = [
     { priority: 2, module: modules.builder, sizeLimit: 0 },
     { priority: 3, module: modules.courier, sizeLimit: 2 },
     { priority: 4, module: modules.repairer, sizeLimit: 1 },
-    { priority: 5, module: modules.miner, sizeLimit: 0 },
+    // { priority: 5, module: modules.miner, sizeLimit: 0 },   ///needs an extractor
     { priority: 6, module: modules.scout, sizeLimit: 1 },
 ];
 

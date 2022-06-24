@@ -60,7 +60,7 @@ const harvest = (creep, room) => {
         }
     }
 
-    if (creep.carry.energy == creep.carryCapacity) {
+    if (creep.store[RESOURCE_ENERGY] == creep.store.getCapacity()) {
         //harvesters should transfer the energy, but other harvesting creeps may want to use the energy for something else
         creep.memory.action =
             creep.memory.role == "harvester" ? "transfer" : undefined;

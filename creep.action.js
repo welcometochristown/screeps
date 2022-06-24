@@ -13,6 +13,7 @@ const actions = {
     pickup: require("action.pickup"),
     scout: require("action.scout"),
     miner: require("action.mine"),
+    wait: require("action.wait"),
 };
 
 const getByAction = (action) => _.filter(actions, (a) => a.action == action)[0];
