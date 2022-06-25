@@ -22,16 +22,41 @@ const repair = (creep, room) => {
     //if no target in memory, or the target is now fully repaired find another
     if (
         !creep.memory.target ||
-        creep.memory.target.hits == creep.memory.target.hitsMax
+        creep.memory.target.hits == creep.memory.target.hitsMax ||
+        [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(
+            creep.memory.target.structureType
+        )
     ) {
         const targets = room.find(FIND_STRUCTURES, {
             filter: (structure) =>
                 structure.hits < structure.hitsMax &&
-                structure.structureType != STRUCTURE_WALL &&
                 targetedAt(structure).length == 0,
         });
 
-        creep.memory.target = closest(creep, targets);
+        const nonWallTargets = _.filter(
+            targets,
+            (target) =>
+                ![STRUCTURE_WALL, STRUCTURE_RAMPART].includes(
+                    target.structureType
+                )
+        );
+        const wallTargets = _.filter(targets, (target) =>
+            [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(target.structureType)
+        );
+
+        if (creep.memory.role == "repairer" && nonWallTargets.length)
+            creep.memory.target = closest(creep, nonWallTargets);
+        else if (wallTargets.length) {
+            const minRange = _.min(
+                wallTargets.map((target) => Math.floor(target.hits / 10000))
+            );
+            const minRangeWallTargets = _.filter(
+                wallTargets,
+                (target) => Math.floor(target.hits / 10000) == minRange
+            );
+
+            creep.memory.target = closest(creep, minRangeWallTargets);
+        }
     }
 
     //try and find a target, move and repair it

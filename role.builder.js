@@ -8,7 +8,7 @@ const nonRoadCount = (sites) =>
 
 const getAction = (creep) => {
     if (!allConstructionSites(creep.room).length) {
-        return "suicide";
+        return "repair";
     }
 
     return "build";

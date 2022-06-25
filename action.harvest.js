@@ -50,7 +50,6 @@ const harvest = (creep, room) => {
     }
 
     if (creep.memory.target) {
-        creep.say("harvesting");
         switch (creep.harvest(creep.memory.target)) {
             case ERR_NOT_IN_RANGE:
                 creep.moveTo(creep.memory.target);

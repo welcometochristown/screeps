@@ -33,7 +33,7 @@ const getAction = (creep) => {
 };
 
 const minRequired = (room, structures = room.find(FIND_MY_STRUCTURES)) =>
-    Math.ceil(structures.length / 10);
+    Math.ceil(structures.length / 25);
 
 module.exports = {
     role: "repairer",

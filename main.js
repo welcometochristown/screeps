@@ -3,6 +3,8 @@ const creepActioner = require("creep.action");
 const structureActioner = require("structure.action");
 const memory = require("util.memory");
 
+const HOME_ROOM = "W56N33";
+
 module.exports.loop = function () {
     //flush memory
     memory.flush();

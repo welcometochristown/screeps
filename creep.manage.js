@@ -6,13 +6,13 @@ const { minRequired: minCouriersRequired } = require("./role.courier");
 
 //keep track of how max amount of screeps we want based on existing structures that need action
 const register = [
-    { priority: 0, module: modules.harvester, sizeLimit: 0 },
-    { priority: 1, module: modules.upgrader, sizeLimit: 0 },
-    { priority: 2, module: modules.builder, sizeLimit: 0 },
-    { priority: 3, module: modules.courier, sizeLimit: 2 },
-    { priority: 4, module: modules.repairer, sizeLimit: 1 },
+    { priority: 0, module: modules.harvester, sizeLimit: 4 },
+    { priority: 1, module: modules.upgrader, sizeLimit: 5 },
+    { priority: 2, module: modules.builder, sizeLimit: 4 },
+    { priority: 3, module: modules.courier, sizeLimit: 3 },
+    { priority: 4, module: modules.repairer, sizeLimit: 3 },
     // { priority: 5, module: modules.miner, sizeLimit: 0 },   ///needs an extractor
-    { priority: 6, module: modules.scout, sizeLimit: 1 },
+    { priority: 6, module: modules.scout, sizeLimit: 2 },
 ];
 
 //false for disabled
@@ -68,13 +68,14 @@ module.exports = {
                 : couriers / minCouriers;
 
         const extensionCapacity = energyCapacity(room, [STRUCTURE_EXTENSION]);
-        const extensionCapacityRatioed = extensionCapacity * ratio; //extension capacity we want to used based on how many couriers we have
-
         const extensionStored = energyStored(room, [STRUCTURE_EXTENSION]);
-        const storedEnergy = energyStored(room);
+
+        const extensionCapacityRatioed = extensionCapacity * ratio; //extension capacity we want to used based on how many couriers we have
 
         //are extensions full enough?
         if (extensionStored < extensionCapacityRatioed) {
+            const storedEnergy = energyStored(room);
+
             //if we have enough energy stored
             if (storedEnergy > extensionCapacityRatioed) {
                 // console.log(

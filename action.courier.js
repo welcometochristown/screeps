@@ -1,5 +1,4 @@
-const { closest, closestEnergyStorage, linkPair } = require("./util.geography");
-const { energyStoredPercentage } = require("./util.resource");
+const { closest, linkPair } = require("./util.geography");
 const { targetedAt } = require("./util.creep");
 
 const courier = (creep, room) => {

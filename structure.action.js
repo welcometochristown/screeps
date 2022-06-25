@@ -17,20 +17,19 @@ const getActionByStructure = (structure) => {
 const action = (structure) => {
     //find the action function the creep currently has in memory
     const memory = findObjectMemory(structure);
+    let action = undefined;
 
     if (memory) {
-        let action = getByAction(memory.action);
+        action = getByAction(memory.action);
 
         if (action) {
+            //continnue doing action until the action in memory is unset
             action.run(structure);
             return;
         }
     }
 
-    //if an action was found do the action
     action = getActionByStructure(structure);
-
-    console.log(`${structure.structureType} action is ${action}`);
     setObjectMemory(structure, { action, target: undefined });
 };
 

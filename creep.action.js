@@ -29,14 +29,14 @@ const action = (creep) => {
 
     //if an action was found, broadcast what the creep is doing, then do the action
     if (action) {
-        if (creep.memory.role == "courier") {
-            const message = `${creep.memory.action} ${
-                creep.memory.target ? creep.memory.target.id : ""
-            }`;
+        // if (creep.memory.role == "courier") {
+        //     const message = `${creep.memory.action} ${
+        //         creep.memory.target ? creep.memory.target.id : ""
+        //     }`;
 
-            //creep.say(message);
-            //  console.log(message);
-        }
+        //     //creep.say(message);
+        //     //  console.log(message);
+        // }
 
         //creeps should only work in the room they were spawned in
         const room = Game.rooms[creep.memory.spawnRoom];

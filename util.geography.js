@@ -10,6 +10,50 @@ const closest = (object, targets) => {
     return _.sortBy(targets, (s) => object.pos.getRangeTo(s))[0];
 };
 
+const linkPair = (room) => {
+    const links = room.find(FIND_MY_STRUCTURES, {
+        filter: { structureType: STRUCTURE_LINK },
+    });
+
+    //only works with 2 links in the same room
+    if (links.length < 2) return undefined;
+
+    const sources = room.find(FIND_SOURCES);
+
+    //todo change this to sender is closest one to source
+    //we can only determine sender vs reciever by source distance
+    if (!sources) return undefined;
+
+    const mapping = _.flatten(
+        sources.map((source) =>
+            links.map((link) => ({
+                link,
+                source,
+                distance: link.pos.getRangeTo(source),
+            }))
+        )
+    );
+
+    // mapping.forEach((map) =>
+    //     console.log(`${map.link.id} -> ${map.source.id} = ${map.distance}`)
+    // );
+
+    mapping.sort(function (a, b) {
+        return a.distance - b.distance;
+    });
+
+    const closestLinkToSource = mapping[0].link;
+
+    // console.log(
+    //     ` closest ${closestLinkToSource.link.id} -> ${closestLinkToSource.source.id} = ${closestLinkToSource.distance}`
+    // );
+
+    const reciever = _.find(links, (link) => link.id != closestLinkToSource.id);
+    const sender = _.find(links, (link) => link.id == closestLinkToSource.id);
+
+    return { reciever, sender };
+};
+
 const getEnergyStructures = (room, filter) => {
     const myEnergyStructures = room.find(FIND_MY_STRUCTURES, {
         filter: (structure) =>
@@ -76,20 +120,42 @@ const findSourceLimit = (room, source) => {
     return limit;
 };
 
+const closestEnergyStorage = (creep, priority = []) => {
+    let pair = linkPair(creep.room);
+
+    let energyStructures = getEnergyStructures(
+        creep.room,
+        (s) =>
+            (s.structureType == STRUCTURE_CONTAINER ||
+                s.structureType == STRUCTURE_STORAGE ||
+                (pair && pair.reciever && pair.reciever.id == s.id)) &&
+            s.store[RESOURCE_ENERGY] > 1
+    );
+
+    return closest(
+        creep,
+        filterByPriority(energyStructures, priority, (s) => s.structureType)
+    );
+};
+
+const closestMineralTransfer = (creep) => {
+    let storages = creep.room.find(FIND_MY_STRUCTURES, {
+        filter: (structure) =>
+            structure.structureType == STRUCTURE_STORAGE &&
+            _.sum(minerals, (mineral) => structure.store[mineral]) /
+                structure.store.getCapacity() <=
+                0.5, //store if there is less than 50% of space used by minerals
+    });
+
+    return closest(creep, storages);
+};
+
 module.exports = {
     isWall,
     findSourceLimit,
-    closestMineralTransfer: (creep) => {
-        let storages = creep.room.find(FIND_MY_STRUCTURES, {
-            filter: (structure) =>
-                structure.structureType == STRUCTURE_STORAGE &&
-                _.sum(minerals, (mineral) => structure.store[mineral]) /
-                    structure.store.getCapacity() <=
-                    0.5, //store if there is less than 50% of space used by minerals
-        });
-
-        return closest(creep, storages);
-    },
+    linkPair,
+    closestEnergyStorage,
+    closestMineralTransfer,
     //closest place to transfer energy to that has availability
     closestEnergyTransfer: (
         creep,
@@ -112,20 +178,7 @@ module.exports = {
     },
 
     //closest energy storage place to withdraw energy
-    closestEnergyStorage: (creep, priority = []) => {
-        let energyStructures = getEnergyStructures(
-            creep.room,
-            (s) =>
-                (s.structureType == STRUCTURE_CONTAINER ||
-                    s.structureType == STRUCTURE_STORAGE) &&
-                s.store[RESOURCE_ENERGY] > 1
-        );
 
-        return closest(
-            creep,
-            filterByPriority(energyStructures, priority, (s) => s.structureType)
-        );
-    },
     //construction sites in same room as creep, or spawns to be constructed in other rooms
     allConstructionSites: (room) =>
         _.flatten(
@@ -138,32 +191,4 @@ module.exports = {
             )
         ),
     closest,
-    linkPair: (room) => {
-        const allLinks = room.find(FIND_MY_STRUCTURES, {
-            filter: { structureType: STRUCTURE_LINK },
-        });
-
-        //only works with 2 links in the same room
-        if (allLinks.length < 2) return undefined;
-
-        const spawns = room.find(FIND_MY_STRUCTURES, {
-            filter: { structureType: STRUCTURE_SPAWN },
-        });
-
-        //we can only determine sender vs reciever by spawn distance
-        if (!spawns) return undefined;
-
-        const closestLinkToSpawn = closest(spawns[0], allLinks);
-
-        const reciever = _.find(
-            allLinks,
-            (link) => link.id == closestLinkToSpawn.id
-        );
-        const sender = _.find(
-            allLinks,
-            (link) => link.id != closestLinkToSpawn.id
-        );
-
-        return { reciever, sender };
-    },
 };
