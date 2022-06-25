@@ -29,13 +29,13 @@ const action = (creep) => {
 
     //if an action was found, broadcast what the creep is doing, then do the action
     if (action) {
-        if (creep.memory.role == "miner") {
-            creep.say(
-                `${creep.memory.action} ${
-                    creep.memory.target ? creep.memory.target.id : ""
-                }`
-            );
-        }
+        // if (creep.memory.role == "harvester") {
+        //     creep.say(
+        //         `${creep.memory.action} ${
+        //             creep.memory.target ? creep.memory.target.id : ""
+        //         }`
+        //     );
+        // }
 
         //creeps should only work in the room they were spawned in
         const room = Game.rooms[creep.memory.spawnRoom];

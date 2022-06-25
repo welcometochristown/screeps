@@ -1,3 +1,5 @@
+const { targetedAt } = require("./util.creep");
+
 const getAction = (creep) => {
     //no structures? we aren't needed!
     if (!creep.room.find(FIND_MY_STRUCTURES).length) {
@@ -7,9 +9,10 @@ const getAction = (creep) => {
     //anything to repair (below 50% health)?
     if (
         creep.room.find(FIND_STRUCTURES, {
-            filter: (object) =>
-                object.hits < object.hitsMax * 0.5 &&
-                object.structureType != STRUCTURE_WALL,
+            filter: (structure) =>
+                structure.hits < structure.hitsMax * 0.5 &&
+                structure.structureType != STRUCTURE_WALL &&
+                targetedAt(structure).length == 0,
         }).length
     ) {
         return "repair";

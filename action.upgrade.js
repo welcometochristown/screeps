@@ -18,12 +18,6 @@ const upgrade = (creep, room) => {
     if (creep.upgradeController(creep.memory.target) == ERR_NOT_IN_RANGE) {
         creep.moveTo(creep.memory.target);
     }
-
-    //upgrade complete, ready for new action
-    if (creep.store[RESOURCE_ENERGY] == 0) {
-        creep.memory.action = undefined;
-        creep.memory.target = undefined;
-    }
 };
 
 module.exports = {

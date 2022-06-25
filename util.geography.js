@@ -91,6 +91,7 @@ module.exports = {
     closestEnergyTransfer: (
         creep,
         priority = [
+            STRUCTURE_LINK,
             STRUCTURE_SPAWN,
             STRUCTURE_EXTENSION,
             STRUCTURE_CONTAINER,

@@ -1,3 +1,4 @@
-1). Harvestors should use all resources, will allow for more harvestors to exist
-2). Non active screeps should stay in holding area (denoted by flag)
-3). Soldiers
+1). Harvestors should use all resources, will allow for more harvestors to exist [x] ( not entirely sure this is working (i.e repairers))
+2). Non active screeps should stay in holding area (denoted by flag) [x]
+3). Soldiers [ ]
+4). Long distance couriers [ ]

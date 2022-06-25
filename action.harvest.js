@@ -1,4 +1,4 @@
-const { targetedAt } = require("util.social");
+const { targetedAt } = require("util.creep");
 const { closest } = require("util.geography");
 const { isWorker } = require("util.creep");
 
@@ -22,11 +22,14 @@ const harvest = (creep, room) => {
         return;
     }
 
-    var sources = room.find(FIND_SOURCES, {
-        filter: (source) => source.energy > 0,
-    });
+    if (creep.memory.target) {
+        creep.memory.target = Game.getObjectById(creep.memory.target.id);
+    }
 
     if (!creep.memory.target) {
+        var sources = room.find(FIND_SOURCES, {
+            filter: (source) => source.energy > 0,
+        });
         var closestSource = closest(creep, sources);
 
         //TODO: Update to work with multiple rooms
@@ -47,16 +50,9 @@ const harvest = (creep, room) => {
     }
 
     if (creep.memory.target) {
-        var source = sources.find((s) => s.id === creep.memory.target.id);
-
-        if (!source) {
-            //current target is no longer in valid source list, find a new one
-            creep.memory.target = undefined;
-            return;
-        }
-
-        if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(source);
+        creep.say("harvesting");
+        if (creep.harvest(creep.memory.target) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(creep.memory.target);
         }
     }
 

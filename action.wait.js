@@ -2,7 +2,7 @@ const { closest } = require("util.geography");
 
 const wait = (creep, room) => {
     const waitingFlags = room.find(FIND_FLAGS, {
-        filter: (flag) => flag.name.toLowerCase() == "wait",
+        filter: (flag) => flag.name.toLowerCase().startsWith("wait"),
     });
     const target = closest(creep, waitingFlags);
     if (target) {

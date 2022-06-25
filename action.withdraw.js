@@ -10,26 +10,24 @@ const withdraw = (creep, room, resource = RESOURCE_ENERGY) => {
         return;
     }
 
-    var target = undefined;
-
     if (creep.memory.target) {
-        //get the target
-        target = Game.getObjectById(creep.memory.target.id);
+        //get the target (must be reloaded)
+        creep.memory.target = Game.getObjectById(creep.memory.target.id);
 
         //TODO : determine resource type by the target type (i.e mineral vs energy)
         //check whether the target has any energy
-        if (!target || target.store[resource] == 0) {
-            target = undefined;
+        if (!creep.memory.target || creep.memory.target.store[resource] == 0) {
+            creep.memory.target = undefined;
         }
     }
 
-    if (!target) {
+    if (!creep.memory.target) {
         //find the closeset {resource} storage location
-        target = closestEnergyStorage(creep);
+        creep.memory.target = closestEnergyStorage(creep);
     }
 
     //if we found one, then move to it and withdraw
-    if (target) {
+    if (creep.memory.target) {
         const storedEnergy = energyStored(room);
         var amount = 0; //as much as possible
 
@@ -41,18 +39,15 @@ const withdraw = (creep, room, resource = RESOURCE_ENERGY) => {
 
             amount = Math.min(
                 amount,
-                target.store.getUsedCapacity(RESOURCE_ENERGY)
+                creep.memory.target.store.getUsedCapacity(RESOURCE_ENERGY)
             );
         }
 
-        const result = creep.withdraw(target, resource, amount);
-
-        if (result == ERR_NOT_IN_RANGE) {
-            creep.moveTo(target);
-        } else if (result != OK) {
-            console.log(
-                `${creep.memory.role} withdraw error : ${result} from ${target.id}, amount ${amount}`
-            );
+        if (
+            creep.withdraw(creep.memory.target, resource, amount) ==
+            ERR_NOT_IN_RANGE
+        ) {
+            creep.moveTo(creep.memory.target);
         }
         return;
     }

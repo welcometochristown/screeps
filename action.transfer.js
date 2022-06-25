@@ -18,73 +18,25 @@ const transfer = (creep, room) => {
         [RESOURCE_ENERGY, ...minerals],
         (resource) => creep.store[resource] > 0
     );
-    var target = undefined;
 
     if (creep.memory.target) {
-        target = Game.getObjectById(creep.memory.target.id);
-    } else {
+        creep.memory.target = Game.getObjectById(creep.memory.target.id);
+    }
+
+    if (!creep.memory.target) {
         //find the right transfer target based on resource
-        target =
+        creep.memory.target =
             resource == RESOURCE_ENERGY
                 ? closestEnergyTransfer(creep)
                 : closestMineralTransfer(creep);
     }
 
-    if (target) {
-        const result = creep.transfer(target, resource);
-        if (result == ERR_NOT_IN_RANGE) {
-            creep.moveTo(target);
-            return;
-        } else if (result != OK) {
-            //console.log(`${creep.name} transfer error : ${result}`);
+    if (creep.memory.target) {
+        if (creep.transfer(creep.memory.target, resource) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(creep.memory.target);
         }
+        return;
     }
-
-    // if(creep.store.)
-
-    // if (creep.store[RESOURCE_ENERGY] > 0) {
-    //     var target = undefined;
-
-    //     if (!creep.memory.target) {
-    //         //find the closeset {resource} transfer location
-    //         target = closestEnergyTransfer(creep);
-    //     } else {
-    //         target = Game.getObjectById(creep.memory.target.id);
-    //     }
-
-    //     if (target) {
-    //         const result = creep.transfer(target, resource);
-    //         if (result == ERR_NOT_IN_RANGE) {
-    //             creep.moveTo(target);
-    //             return;
-    //         } else if (result != OK) {
-    //             //console.log(`${creep.name} transfer error : ${result}`);
-    //         }
-    //     }
-    // }
-
-    // minerals.forEach((mineral) => {
-    //     if (!creep.store[mineral]) return;
-
-    //     // var target = undefined;
-
-    //     // if (!creep.memory.target) {
-    //     //     //find the closeset {resource} transfer location
-    //     //     target = closestEnergyTransfer(creep);
-    //     // } else {
-    //     //     target = Game.getObjectById(creep.memory.target.id);
-    //     // }
-
-    //     // if (target) {
-    //     //     const result = creep.transfer(target, resource);
-    //     //     if (result == ERR_NOT_IN_RANGE) {
-    //     //         creep.moveTo(target);
-    //     //         return;
-    //     //     } else if (result != OK) {
-    //     //         //console.log(`${creep.name} transfer error : ${result}`);
-    //     //     }
-    //     // }
-    // });
 
     //no targets to transfer to
     creep.memory.action = undefined;

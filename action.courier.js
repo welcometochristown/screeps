@@ -1,6 +1,6 @@
 const { closest, closestEnergyStorage } = require("./util.geography");
 const { energyStoredPercentage } = require("./util.resource");
-const { targetedAt } = require("./util.social");
+const { targetedAt } = require("./util.creep");
 
 const courier = (creep, room) => {
     if (creep.store[RESOURCE_ENERGY] > 0) {
@@ -92,16 +92,26 @@ const courier = (creep, room) => {
         return;
     }
 
-    const spawnEnergyFull =
-        energyStoredPercentage(room, [STRUCTURE_SPAWN, STRUCTURE_EXTENSION]) ==
-        1;
-    const closestStore = closestEnergyStorage(
-        creep,
-        spawnEnergyFull ? [STRUCTURE_CONTAINER] : []
-    );
+    const links = room.find(FIND_MY_STRUCTURES, {
+        filter: (structure) =>
+            structure.structureType == STRUCTURE_LINK &&
+            structure.store[RESOURCE_ENERGY] > 0,
+    });
 
-    if (closestStore) {
-        creep.memory.target = closestStore;
+    if (links.length) {
+        creep.memory.target = closest(creep, link);
+        creep.memory.action = "withdraw";
+        return;
+    }
+
+    const containers = room.find(FIND_STRUCTURES, {
+        filter: (structure) =>
+            structure.structureType == STRUCTURE_CONTAINER &&
+            structure.store[RESOURCE_ENERGY] > 0,
+    });
+
+    if (containers.length) {
+        creep.memory.target = closest(creep, containers);
         creep.memory.action = "withdraw";
         return;
     }

@@ -20,26 +20,33 @@ const build = (creep, room) => {
         return;
     }
 
-    const sites = allConstructionSites(room);
+    if (creep.memory.target) {
+        creep.memory.target = Game.getObjectById(creep.memory.target.id);
+    }
 
-    const prioritisedSites = filterByPriority(
-        sites,
-        [
-            STRUCTURE_SPAWN,
-            STRUCTURE_TOWER,
-            STRUCTURE_EXTENSION,
-            STRUCTURE_STORAGE,
-            STRUCTURE_ROAD,
-        ],
-        (item) => item.structureType
-    );
+    //not already building something, or progress is complete
+    if (!creep.memory.target || creep.memory.target.progress === undefined) {
+        const sites = allConstructionSites(room);
 
-    creep.memory.target = closest(creep, prioritisedSites);
+        const prioritisedSites = filterByPriority(
+            sites,
+            [
+                STRUCTURE_SPAWN,
+                STRUCTURE_TOWER,
+                STRUCTURE_EXTENSION,
+                STRUCTURE_STORAGE,
+                STRUCTURE_ROAD,
+            ],
+            (item) => item.structureType
+        );
 
-    //if there are no construction sites, kill thyself
+        creep.memory.target = closest(creep, prioritisedSites);
+    }
+
+    //if there are still no construction sites
     if (!creep.memory.target) {
         creep.memory.action =
-            creep.memory.role == "builder" ? "suicide" : undefined;
+            creep.memory.role == "builder" ? "harvest" : undefined;
         creep.memory.target = undefined;
     }
 
