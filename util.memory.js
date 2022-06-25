@@ -1,7 +1,7 @@
 const { findSourceLimit } = require("./util.geography");
 
 const flushCreeps = () => {
-    for (var i in Memory.creeps) {
+    for (let i in Memory.creeps) {
         if (!Game.creeps[i]) {
             delete Memory.creeps[i];
         }
@@ -34,7 +34,7 @@ const initRoomMemory = () => {
 
     Memory.rooms = [];
 
-    for (var roomName in Game.rooms) {
+    for (let roomName in Game.rooms) {
         let room = Game.rooms[roomName];
         Memory.rooms.push({ room, sources: [] });
 

@@ -1,6 +1,8 @@
 const {
     closestEnergyTransfer,
     closestMineralTransfer,
+    linkPair,
+    closest,
 } = require("util.geography");
 const { getModuleByRole } = require("./util.social");
 const { minerals } = require("util.resource");
@@ -21,19 +23,44 @@ const transfer = (creep, room) => {
 
     if (creep.memory.target) {
         creep.memory.target = Game.getObjectById(creep.memory.target.id);
-    }
-
-    if (!creep.memory.target) {
+    } else {
         //find the right transfer target based on resource
         creep.memory.target =
             resource == RESOURCE_ENERGY
                 ? closestEnergyTransfer(creep)
                 : closestMineralTransfer(creep);
+
+        if (creep.memory.target) {
+            //todo this doesnt work currently
+            // //if we are transferring energy, lets see if the link sender is closer
+            if (resource == RESOURCE_ENERGY) {
+                const pair = linkPair(room);
+
+                if (pair) {
+                    creep.memory.target = closest(creep, [
+                        creep.memory.target,
+                        pair.sender,
+                    ]);
+                }
+            }
+        }
+    }
+
+    if (
+        creep.memory.target &&
+        creep.memory.target.store.getFreeCapacity() == 0
+    ) {
+        creep.memory.target = undefined;
     }
 
     if (creep.memory.target) {
-        if (creep.transfer(creep.memory.target, resource) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(creep.memory.target);
+        switch (creep.transfer(creep.memory.target, resource)) {
+            case ERR_NOT_IN_RANGE:
+                creep.moveTo(creep.memory.target);
+                break;
+            case ERR_FULL:
+                creep.memory.target = undefined;
+                break;
         }
         return;
     }

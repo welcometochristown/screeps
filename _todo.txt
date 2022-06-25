@@ -2,3 +2,4 @@
 2). Non active screeps should stay in holding area (denoted by flag) [x]
 3). Soldiers [ ]
 4). Long distance couriers [ ]
+5). Use error codes a bit more to denote change in action [ ] -- actually this is bad as travel time is wasted

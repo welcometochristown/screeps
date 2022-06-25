@@ -4,11 +4,11 @@ const structureActioner = require("structure.action");
 const memory = require("util.memory");
 
 module.exports.loop = function () {
-    //flush memory 
+    //flush memory
     memory.flush();
     memory.init();
 
-    for (var name in Game.rooms) {
+    for (let name in Game.rooms) {
         const room = Game.rooms[name];
 
         //manager controls the creation and removal of screeps dependent on our current needs

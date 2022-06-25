@@ -19,7 +19,7 @@ const action = (structure) => {
     const memory = findObjectMemory(structure);
 
     if (memory) {
-        var action = getByAction(memory.action);
+        let action = getByAction(memory.action);
 
         if (action) {
             action.run(structure);

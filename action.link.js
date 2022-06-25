@@ -1,28 +1,15 @@
-const { closest } = require("util.geography");
+const { closest, linkPair } = require("util.geography");
 
 const link = (structure) => {
-    const allLinks = structure.room.find(FIND_MY_STRUCTURES, {
-        filter: { structureType: STRUCTURE_LINK },
-    });
+    const pair = linkPair(structure.room);
 
-    //only works with 2 links in the same room
-    if (allLinks.length < 2) return;
-
-    const spawns = structure.room.find(FIND_MY_STRUCTURES, {
-        filter: { structureType: STRUCTURE_SPAWN },
-    });
-
-    if (!spawns) return;
-
-    const closestLinkToSpawn = closest(spawns[0], allLinks);
-
-    const reciever = _.find(allLinks, (link) => link.id == closestLinkToSpawn);
-    const sender = _.find(allLinks, (link) => link.id != closestLinkToSpawn);
-
+    //make sure there is a pair
+    if (!pair) return;
     //we are the closest to spawn, the reciever dont do anything
-    if (sender.id == structure.id) return;
+    if (pair.sender.id == structure.id) return;
 
-    if (sender.store[RESOURCE_ENERGY > 0]) sender.transferEnergy(reciever);
+    if (pair.sender.store[RESOURCE_ENERGY] > 0)
+        pair.sender.transferEnergy(pair.reciever);
 };
 
 module.exports = {

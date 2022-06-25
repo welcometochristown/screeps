@@ -26,15 +26,15 @@ const FIXED_RATIO = 0.5;
 
 //spawn each role one at a time, in priority order
 const nextSpawn = (room) => {
-    var nextSpawn = undefined;
-    for (var c in _.sortBy(register, (r) => r.priority)) {
-        var item = register[c];
+    let nextSpawn = undefined;
+    for (let c in _.sortBy(register, (r) => r.priority)) {
+        let item = register[c];
 
         //how many creeps required for this room
-        var requiredCreeps = item.module.minRequired(room);
+        let requiredCreeps = item.module.minRequired(room);
 
         //how many creeps do we have of this role in this room currently?
-        var actualCreeps = _.size(getCreepsByRole(room, item.module.role));
+        let actualCreeps = _.size(getCreepsByRole(room, item.module.role));
 
         // console.log(
         //     `${room.name} ${item.module.role} ${actualCreeps}/${requiredCreeps}`

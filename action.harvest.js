@@ -4,13 +4,13 @@ const { isWorker } = require("util.creep");
 
 const isSourceFull = (source) => {
     //get room info memory object
-    var roomInfo = Memory.rooms.find((i) => i.room.name == source.room.name);
+    let roomInfo = Memory.rooms.find((i) => i.room.name == source.room.name);
 
     //info about the source
-    var sourceInfo = roomInfo.sources.find((i) => i.source.id == source.id);
+    let sourceInfo = roomInfo.sources.find((i) => i.source.id == source.id);
 
     //current count of creeps working on this source
-    var creepCount = targetedAt(source).length;
+    let creepCount = targetedAt(source).length;
 
     return creepCount >= sourceInfo.limit;
 };
@@ -27,15 +27,15 @@ const harvest = (creep, room) => {
     }
 
     if (!creep.memory.target) {
-        var sources = room.find(FIND_SOURCES, {
+        let sources = room.find(FIND_SOURCES, {
             filter: (source) => source.energy > 0,
         });
-        var closestSource = closest(creep, sources);
+        let closestSource = closest(creep, sources);
 
         //TODO: Update to work with multiple rooms
         while (sources.length) {
             //get the next closest source
-            var source = closest(creep, sources);
+            let source = closest(creep, sources);
 
             //if source is full, remove from list and lets go again
             if (isSourceFull(source)) {
@@ -51,8 +51,10 @@ const harvest = (creep, room) => {
 
     if (creep.memory.target) {
         creep.say("harvesting");
-        if (creep.harvest(creep.memory.target) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(creep.memory.target);
+        switch (creep.harvest(creep.memory.target)) {
+            case ERR_NOT_IN_RANGE:
+                creep.moveTo(creep.memory.target);
+                break;
         }
     }
 

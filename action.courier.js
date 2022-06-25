@@ -1,4 +1,4 @@
-const { closest, closestEnergyStorage } = require("./util.geography");
+const { closest, closestEnergyStorage, linkPair } = require("./util.geography");
 const { energyStoredPercentage } = require("./util.resource");
 const { targetedAt } = require("./util.creep");
 
@@ -64,7 +64,7 @@ const courier = (creep, room) => {
 
     // if (droppedEnergy.length > 0) {
     //     console.log("picking up dropped energy ");
-    //     var target = closest(creep, droppedEnergy);
+    //     let target = closest(creep, droppedEnergy);
     //     creep.memory.target = target;
     //     creep.memory.action = "pickup";
     //     return;
@@ -92,14 +92,9 @@ const courier = (creep, room) => {
         return;
     }
 
-    const links = room.find(FIND_MY_STRUCTURES, {
-        filter: (structure) =>
-            structure.structureType == STRUCTURE_LINK &&
-            structure.store[RESOURCE_ENERGY] > 0,
-    });
-
-    if (links.length) {
-        creep.memory.target = closest(creep, link);
+    const pair = linkPair(creep.room);
+    if (pair && pair.reciever.store[RESOURCE_ENERGY] > 0) {
+        creep.memory.target = pair.reciever;
         creep.memory.action = "withdraw";
         return;
     }

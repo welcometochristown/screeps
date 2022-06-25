@@ -1,7 +1,10 @@
 const { filterByPriority } = require("util.common");
 
 const closest = (object, targets) => {
-    if (!targets) return undefined;
+    if (!targets) {
+        console.log("no targets defined in closest function");
+        return undefined;
+    }
     if (targets.length == 0) return undefined;
     if (targets.length == 1) return targets[0];
     return _.sortBy(targets, (s) => object.pos.getRangeTo(s))[0];
@@ -37,7 +40,7 @@ const isWall = (room, point) =>
 //find how many creeps can work a source
 const findSourceLimit = (room, source) => {
     const topLeft = { x: source.pos.x - 1, y: source.pos.y - 1 };
-    var limit = 0;
+    let limit = 0;
 
     for (let x = 0; x < 3; x++) {
         for (let y = 0; y < 3; y++) {
@@ -77,7 +80,7 @@ module.exports = {
     isWall,
     findSourceLimit,
     closestMineralTransfer: (creep) => {
-        var storages = creep.room.find(FIND_MY_STRUCTURES, {
+        let storages = creep.room.find(FIND_MY_STRUCTURES, {
             filter: (structure) =>
                 structure.structureType == STRUCTURE_STORAGE &&
                 _.sum(minerals, (mineral) => structure.store[mineral]) /
@@ -91,14 +94,13 @@ module.exports = {
     closestEnergyTransfer: (
         creep,
         priority = [
-            STRUCTURE_LINK,
             STRUCTURE_SPAWN,
             STRUCTURE_EXTENSION,
             STRUCTURE_CONTAINER,
             STRUCTURE_STORAGE,
         ]
     ) => {
-        var energyStructures = getEnergyStructures(
+        let energyStructures = getEnergyStructures(
             creep.room,
             (s) => s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
         );
@@ -111,7 +113,7 @@ module.exports = {
 
     //closest energy storage place to withdraw energy
     closestEnergyStorage: (creep, priority = []) => {
-        var energyStructures = getEnergyStructures(
+        let energyStructures = getEnergyStructures(
             creep.room,
             (s) =>
                 (s.structureType == STRUCTURE_CONTAINER ||
@@ -136,4 +138,32 @@ module.exports = {
             )
         ),
     closest,
+    linkPair: (room) => {
+        const allLinks = room.find(FIND_MY_STRUCTURES, {
+            filter: { structureType: STRUCTURE_LINK },
+        });
+
+        //only works with 2 links in the same room
+        if (allLinks.length < 2) return undefined;
+
+        const spawns = room.find(FIND_MY_STRUCTURES, {
+            filter: { structureType: STRUCTURE_SPAWN },
+        });
+
+        //we can only determine sender vs reciever by spawn distance
+        if (!spawns) return undefined;
+
+        const closestLinkToSpawn = closest(spawns[0], allLinks);
+
+        const reciever = _.find(
+            allLinks,
+            (link) => link.id == closestLinkToSpawn.id
+        );
+        const sender = _.find(
+            allLinks,
+            (link) => link.id != closestLinkToSpawn.id
+        );
+
+        return { reciever, sender };
+    },
 };

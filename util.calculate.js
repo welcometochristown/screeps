@@ -14,7 +14,7 @@ module.exports = {
 
     // (Number of body parts, excluding MOVE and empty CARRY parts)
     weight: (body) => {
-        var exclude = ["MOVE", "CARRY"];
+        let exclude = ["MOVE", "CARRY"];
         return _.filter(
             body,
             (i) => !exclude.includes(i.toString().toUpperCase())
@@ -22,7 +22,7 @@ module.exports = {
     },
 
     availableBuildEnergy: (room) => {
-        var energyStructures = room.find(FIND_MY_STRUCTURES, {
+        let energyStructures = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) =>
                 [STRUCTURE_SPAWN, STRUCTURE_EXTENSION].includes(
                     structure.structureType

@@ -7,13 +7,13 @@ const makeName = (role) => role.substring(0, 1) + Game.time.toString(16);
 module.exports = {
     spawnCreep: (room, role, sizeLimit, prioritise) => {
         //how much energy do we have to build with?
-        var available = availableBuildEnergy(room);
+        let available = availableBuildEnergy(room);
 
         //get the correct module by role
-        var module = getModuleByRole(role);
+        let module = getModuleByRole(role);
 
         //construct body blueprint from module
-        var body = construct(
+        let body = construct(
             module.blueprint,
             available,
             sizeLimit,
@@ -29,11 +29,11 @@ module.exports = {
         console.log(`spawning ${role} in ${room.name}`);
 
         //find all spawns in our room
-        var spawns = room.find(FIND_MY_STRUCTURES, {
+        let spawns = room.find(FIND_MY_STRUCTURES, {
             filter: { structureType: STRUCTURE_SPAWN },
         });
 
-        for (var i in spawns) {
+        for (let i in spawns) {
             //only spawn one creep at a time from each spawn
             if (spawns[i].spawning) continue;
 

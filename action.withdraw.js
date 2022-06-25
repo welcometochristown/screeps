@@ -26,10 +26,15 @@ const withdraw = (creep, room, resource = RESOURCE_ENERGY) => {
         creep.memory.target = closestEnergyStorage(creep);
     }
 
+    //make sure there are resources at the target location
+    if (creep.memory.target && creep.memory.target.store[resource] == 0) {
+        creep.memory.target = undefined;
+    }
+
     //if we found one, then move to it and withdraw
     if (creep.memory.target) {
         const storedEnergy = energyStored(room);
-        var amount = 0; //as much as possible
+        let amount = 0; //as much as possible
 
         if (creep.memory.role == "upgrader") {
             amount = Math.min(

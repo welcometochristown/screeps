@@ -2,13 +2,13 @@ const { cost, parts } = require("util.calculate");
 
 module.exports = {
     construct: (blueprint, energy, sizeLimit, prioritise) => {
-        var body = [...blueprint];
+        let body = [...blueprint];
 
         //basic body
-        var basic_cost = cost(body);
+        let basic_cost = cost(body);
 
         //how big can we make it with energy
-        var size = _.floor(energy / basic_cost);
+        let size = _.floor(energy / basic_cost);
 
         //limit the amount of times we increase it based on sizeLimit
         if (sizeLimit > 0) {
@@ -16,7 +16,7 @@ module.exports = {
         }
 
         //increase by size times
-        for (var i = 1; i < size; i++) {
+        for (let i = 1; i < size; i++) {
             body = body.concat([...blueprint]);
         }
 
@@ -25,11 +25,11 @@ module.exports = {
         // );
 
         // while (true) {
-        //     var new_cost = cost(body);
-        //     var remaining = energy - new_cost;
+        //     let new_cost = cost(body);
+        //     let remaining = energy - new_cost;
 
         //     //TODO : this always takes the first instance of 100 or 50 it should pop each one then reset
-        //     var spare_parts = _.sortBy(
+        //     let spare_parts = _.sortBy(
         //         _.filter(
         //             _.map(parts, (p, k) => ({ key: k, value: p })),
         //             (n) =>

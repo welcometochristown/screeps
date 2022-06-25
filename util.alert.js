@@ -3,13 +3,13 @@
  * module.exports.thing = 'a thing';
  *
  * You can import it from another modules like this:
- * var mod = require('util.action');
+ * let mod = require('util.action');
  * mod.thing == 'a thing'; // true
  */
 
 module.exports = {
-    verbose: function(creep, func) {
-          const result_map = [
+    verbose: function (creep, func) {
+        const result_map = [
             ["OK", 0],
             ["NOT_OWNER", -1],
             ["NO_PATH", -2],
@@ -26,14 +26,12 @@ module.exports = {
             ["NOT_ENOUGH_EXTENSIONS", -6],
             ["RCL_NOT_ENOUGH", -14],
             ["GCL_NOT_ENOUGH", -15],
-        ]
-    
-        var code = func();
-        if(code != OK) {
-            var message = _.find(result_map, i => i[1] == code)[0];
-            creep.say(message)    
+        ];
+
+        let code = func();
+        if (code != OK) {
+            let message = _.find(result_map, (i) => i[1] == code)[0];
+            creep.say(message);
         }
-    }
-    
-  
+    },
 };
