@@ -1,5 +1,6 @@
 const { closest, linkPair } = require("./util.geography");
 const { targetedAt } = require("./util.creep");
+const { energyStoredPercentage } = require("./util.resource");
 
 const courier = (creep, room) => {
     if (creep.store[RESOURCE_ENERGY] > 0) {
@@ -54,6 +55,32 @@ const courier = (creep, room) => {
             creep.memory.action = "transfer";
             return;
         }
+
+        const allStorages = _.flatten(
+            _.map(Game.rooms, (room) =>
+                room.find(FIND_MY_STRUCTURES, {
+                    filter: (structure) =>
+                        structure.structureType == STRUCTURE_STORAGE &&
+                        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
+                        structure.room != undefined,
+                })
+            )
+        );
+
+        if (allStorages.length) {
+            creep.memory.target = closest(creep, allStorages);
+            creep.memory.action = "transfer";
+            return;
+        }
+    }
+
+    if (creep.memory.spawnRoom != creep.room.name) {
+        let spawnRoom = Game.rooms[creep.memory.spawnRoom];
+        let spawn = spawnRoom.find(FIND_STRUCTURES, {
+            filter: { structureType: STRUCTURE_SPAWN },
+        })[0];
+        creep.moveTo(spawn);
+        return;
     }
 
     //TODO : keeps getting -7 errors. no idea why
@@ -110,8 +137,24 @@ const courier = (creep, room) => {
         return;
     }
 
+    if (
+        energyStoredPercentage(room, [STRUCTURE_SPAWN, STRUCTURE_EXTENSION]) < 1
+    ) {
+        const storages = room.find(FIND_MY_STRUCTURES, {
+            filter: (structure) =>
+                structure.structureType == STRUCTURE_STORAGE &&
+                structure.store[RESOURCE_ENERGY] > 0,
+        });
+
+        if (storages.length) {
+            creep.memory.target = closest(creep, storages);
+            creep.memory.action = "withdraw";
+            return;
+        }
+    }
+
     creep.memory.target = undefined;
-    creep.memory.action = "wait";
+    creep.memory.action = "harvest";
 };
 
 module.exports = {

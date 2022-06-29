@@ -19,25 +19,11 @@ const actions = {
 const getByAction = (action) => _.filter(actions, (a) => a.action == action)[0];
 
 const action = (creep) => {
-    // if (creep.memory.role == "miner") {
-    //     creep.memory.action = undefined;
-    //     creep.memory.target = undefined;
-    // }
-
     //find the action function the creep currently has in memory
     const action = getByAction(creep.memory.action);
 
-    //if an action was found, broadcast what the creep is doing, then do the action
+    //if an action was fou'nd, broadcast what the creep is doing, then do the action
     if (action) {
-        // if (creep.memory.role == "courier") {
-        //     const message = `${creep.memory.action} ${
-        //         creep.memory.target ? creep.memory.target.id : ""
-        //     }`;
-
-        //     //creep.say(message);
-        //     //  console.log(message);
-        // }
-
         //creeps should only work in the room they were spawned in
         const room = Game.rooms[creep.memory.spawnRoom];
 
@@ -48,6 +34,15 @@ const action = (creep) => {
         let module = getModuleByRole(creep.memory.role);
         creep.memory.action = module.getAction(creep);
     }
+
+    // if (creep.memory.role == "repairer") {
+    //     const message = `${creep.memory.action} ${
+    //         creep.memory.target ? creep.memory.target.id : ""
+    //     }`;
+
+    //     creep.say(message);
+    //     console.log(message);
+    // }
 
     //say hello lol
     // if (

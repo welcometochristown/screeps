@@ -47,7 +47,8 @@ const initRoomMemory = () => {
     }
 };
 
-const init = () => {
+const init = (mainRoomName) => {
+    Memory.mainRoomName = mainRoomName;
     initRoomMemory();
 };
 

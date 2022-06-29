@@ -5,3 +5,5 @@
 5). Use error codes a bit more to denote change in action [ ] -- actually this is bad as travel time is wasted
 6). Spawn creeps for building in neighbouring (non-spawn) room (maybe look for another room and use its spawn) determine required roles based on structures? [ ]\
 7). Dont spawn full size creeps, it uses too much resources. Scale these appropriately. [ ]
+8). Link action and role getAction to reduce code repitiion
+9). Repair stuff under 10% hits first

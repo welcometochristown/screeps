@@ -54,13 +54,22 @@ const transfer = (creep, room) => {
     }
 
     if (creep.memory.target) {
-        switch (creep.transfer(creep.memory.target, resource)) {
+        const result = creep.transfer(creep.memory.target, resource);
+
+        switch (result) {
             case ERR_NOT_IN_RANGE:
-                creep.moveTo(creep.memory.target);
+                creep.moveTo(creep.memory.target, { maxOps: 5000 });
                 break;
             case ERR_FULL:
                 creep.memory.target = undefined;
                 break;
+            case OK:
+                break;
+            default:
+                creep.say(result);
+                console.log(
+                    `${creep.name} in room ${creep.room.name} - transfer to ${creep.memory.target.structureType} in room ${creep.memory.target.room.name} result = ${result}`
+                );
         }
         return;
     }

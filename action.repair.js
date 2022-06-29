@@ -40,8 +40,12 @@ const repair = (creep, room) => {
                     target.structureType
                 )
         );
-        const wallTargets = _.filter(targets, (target) =>
-            [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(target.structureType)
+        const wallTargets = _.filter(
+            targets,
+            (target) =>
+                [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(
+                    target.structureType
+                ) && target.hits < 50000 //only build to 100 000
         );
 
         if (creep.memory.role == "repairer" && nonWallTargets.length)
@@ -66,6 +70,8 @@ const repair = (creep, room) => {
         }
         return;
     }
+
+    console.log(`${creep.name} nothing to repair`);
 
     //nothing to repair
     creep.memory.action = undefined;

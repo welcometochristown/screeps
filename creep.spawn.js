@@ -26,6 +26,9 @@ module.exports = {
             return;
         }
 
+        //sort so all parts of the same type are shown together
+        body = body.sort((a, b) => a - b);
+
         console.log(`spawning ${role} in ${room.name}`);
 
         //find all spawns in our room

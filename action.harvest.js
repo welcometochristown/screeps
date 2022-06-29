@@ -26,7 +26,7 @@ const harvest = (creep, room) => {
         creep.memory.target = Game.getObjectById(creep.memory.target.id);
     }
 
-    if (!creep.memory.target) {
+    if (!creep.memory.target || creep.memory.target.energy == 0) {
         let sources = room.find(FIND_SOURCES, {
             filter: (source) => source.energy > 0,
         });

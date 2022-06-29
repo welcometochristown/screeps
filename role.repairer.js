@@ -10,9 +10,12 @@ const getAction = (creep) => {
     if (
         creep.room.find(FIND_STRUCTURES, {
             filter: (structure) =>
-                structure.hits < structure.hitsMax * 0.5 &&
-                structure.structureType != STRUCTURE_WALL &&
-                targetedAt(structure).length == 0,
+                (structure.hits < structure.hitsMax * 0.5 &&
+                    targetedAt(structure).length == 0 &&
+                    ![STRUCTURE_WALL, STRUCTURE_RAMPART].includes(
+                        structure.structureType
+                    )) ||
+                structure.hits < 50000,
         }).length
     ) {
         return "repair";
