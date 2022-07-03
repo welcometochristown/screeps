@@ -7,3 +7,56 @@
 7). Dont spawn full size creeps, it uses too much resources. Scale these appropriately. [ ]
 8). Link action and role getAction to reduce code repitiion
 9). Repair stuff under 10% hits first
+10) limit withdrawal if storage under a certain percentage
+11). set all screeps to courier duty during wartime
+
+
+//long distance courier
+       // const allStorages = _.flatten(
+        //     _.map(Game.rooms, (room) =>
+        //         room.find(FIND_MY_STRUCTURES, {
+        //             filter: (structure) =>
+        //                 structure.structureType == STRUCTURE_STORAGE &&
+        //                 structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
+        //                 structure.room != undefined,
+        //         })
+        //     )
+        // );
+
+        // if (allStorages.length) {
+        //     creep.memory.target = closest(creep, allStorages);
+        //     creep.memory.action = "transfer";
+        //     return;
+        // }
+
+
+            if (creep.memory.spawnRoom != creep.room.name) {
+        let spawnRoom = Game.rooms[creep.memory.spawnRoom];
+        let spawn = spawnRoom.find(FIND_STRUCTURES, {
+            filter: { structureType: STRUCTURE_SPAWN },
+        })[0];
+        creep.moveTo(spawn);
+        return;
+    }
+
+
+
+
+
+        //was using this to courier extra energy between rooms, but its not good enough
+    // - rooms that dont need the extra couriers still get them etc.
+    // const spawnAndExtensionCapacity = energyCapacity(room, [
+    //     STRUCTURE_SPAWN,
+    //     STRUCTURE_EXTENSION,
+    // ]);
+
+    // if (spawnAndExtensionCapacity > 0) {
+    //     const extraPercentage =
+    //         Math.floor(
+    //             energyStored(room, [STRUCTURE_CONTAINER]) /
+    //                 spawnAndExtensionCapacity
+    //         ) * 100;
+
+    //     //add an extra courier for every extra 500% we have
+    //     required += Math.floor(extraPercentage / 500);
+    // }

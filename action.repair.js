@@ -2,7 +2,7 @@ const { closest } = require("./util.geography");
 const { isWorker } = require("./util.creep");
 const { targetedAt } = require("./util.creep");
 
-const repair = (creep, room) => {
+const repair = (creep, room, maxWallSize = 50000, wallchunk = 5000) => {
     if (!isWorker(creep)) {
         creep.memory.target = undefined;
         creep.memory.action = undefined;
@@ -15,48 +15,32 @@ const repair = (creep, room) => {
         return;
     }
 
-    if (creep.memory.target) {
-        creep.memory.target = Game.getObjectById(creep.memory.target.id);
-    }
-
     //if no target in memory, or the target is now fully repaired find another
     if (
         !creep.memory.target ||
         creep.memory.target.hits == creep.memory.target.hitsMax ||
-        [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(
-            creep.memory.target.structureType
-        )
+        [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(creep.memory.target.structureType) // change wall/rampart building site every {wallchunk}
     ) {
         const targets = room.find(FIND_STRUCTURES, {
-            filter: (structure) =>
-                structure.hits < structure.hitsMax &&
-                targetedAt(structure).length == 0,
+            filter: (structure) => structure.hits < structure.hitsMax && targetedAt(structure).length == 0,
         });
 
         const nonWallTargets = _.filter(
             targets,
-            (target) =>
-                ![STRUCTURE_WALL, STRUCTURE_RAMPART].includes(
-                    target.structureType
-                )
+            (target) => ![STRUCTURE_WALL, STRUCTURE_RAMPART].includes(target.structureType)
         );
         const wallTargets = _.filter(
             targets,
-            (target) =>
-                [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(
-                    target.structureType
-                ) && target.hits < 50000 //only build to 100 000
+            (target) => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(target.structureType) && target.hits < maxWallSize //only build to {maxWallSize}
         );
 
         if (creep.memory.role == "repairer" && nonWallTargets.length)
             creep.memory.target = closest(creep, nonWallTargets);
         else if (wallTargets.length) {
-            const minRange = _.min(
-                wallTargets.map((target) => Math.floor(target.hits / 10000))
-            );
+            const minRange = _.min(wallTargets.map((target) => Math.floor(target.hits / wallchunk)));
             const minRangeWallTargets = _.filter(
                 wallTargets,
-                (target) => Math.floor(target.hits / 10000) == minRange
+                (target) => Math.floor(target.hits / wallchunk) == minRange
             );
 
             creep.memory.target = closest(creep, minRangeWallTargets);
@@ -70,8 +54,6 @@ const repair = (creep, room) => {
         }
         return;
     }
-
-    console.log(`${creep.name} nothing to repair`);
 
     //nothing to repair
     creep.memory.action = undefined;

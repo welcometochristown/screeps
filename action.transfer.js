@@ -1,10 +1,4 @@
-const {
-    closestEnergyTransfer,
-    closestMineralTransfer,
-    linkPair,
-    closest,
-} = require("util.geography");
-const { getModuleByRole } = require("./util.social");
+const { closestEnergyTransfer, closestMineralTransfer, linkPair, closest } = require("util.geography");
 const { minerals } = require("util.resource");
 
 const transfer = (creep, room) => {
@@ -16,19 +10,14 @@ const transfer = (creep, room) => {
     }
 
     //get a resource the creep is carrying
-    const resource = _.find(
-        [RESOURCE_ENERGY, ...minerals],
-        (resource) => creep.store[resource] > 0
-    );
+    const resource = _.find([RESOURCE_ENERGY, ...minerals], (resource) => creep.store[resource] > 0);
 
     if (creep.memory.target) {
         creep.memory.target = Game.getObjectById(creep.memory.target.id);
     } else {
         //find the right transfer target based on resource
         creep.memory.target =
-            resource == RESOURCE_ENERGY
-                ? closestEnergyTransfer(creep)
-                : closestMineralTransfer(creep);
+            resource == RESOURCE_ENERGY ? closestEnergyTransfer(creep) : closestMineralTransfer(creep);
 
         if (creep.memory.target) {
             //todo this doesnt work currently
@@ -37,19 +26,13 @@ const transfer = (creep, room) => {
                 const pair = linkPair(room);
 
                 if (pair) {
-                    creep.memory.target = closest(creep, [
-                        creep.memory.target,
-                        pair.sender,
-                    ]);
+                    creep.memory.target = closest(creep, [creep.memory.target, pair.sender]);
                 }
             }
         }
     }
 
-    if (
-        creep.memory.target &&
-        creep.memory.target.store.getFreeCapacity() == 0
-    ) {
+    if (creep.memory.target && creep.memory.target.store.getFreeCapacity() == 0) {
         creep.memory.target = undefined;
     }
 

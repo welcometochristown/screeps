@@ -1,8 +1,5 @@
 const scout = (creep, room) => {
-    const flag = _.filter(
-        Game.flags,
-        (f) => f.name.toLowerCase() == "capture"
-    )[0];
+    const flag = _.filter(Game.flags, (f) => f.name.toLowerCase() == "capture")[0];
 
     if (flag) {
         if (!flag.room || creep.room.name != flag.room.name) {
@@ -16,20 +13,14 @@ const scout = (creep, room) => {
 
             if (!controller) return;
 
-            if (
-                !controller.owner ||
-                controller.owner.username != "thunderbeans"
-            ) {
+            if (!controller.owner || controller.owner.username != "thunderbeans") {
                 if (creep.claimController(controller) == ERR_NOT_IN_RANGE) {
                     console.log("moving to room controller");
                     creep.moveTo(controller);
                 }
             }
 
-            if (
-                controller.owner &&
-                controller.owner.username == "thunderbeans"
-            ) {
+            if (controller.owner && controller.owner.username == "thunderbeans") {
                 flag.remove();
             }
         }

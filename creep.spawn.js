@@ -13,12 +13,7 @@ module.exports = {
         let module = getModuleByRole(role);
 
         //construct body blueprint from module
-        let body = construct(
-            module.blueprint,
-            available,
-            sizeLimit,
-            prioritise
-        );
+        let body = construct(module.blueprint, available, sizeLimit, prioritise);
 
         //dont have enough to create this body, then quit
         if (available < cost(body)) {
@@ -27,9 +22,7 @@ module.exports = {
         }
 
         //sort so all parts of the same type are shown together
-        body = body.sort((a, b) => a - b);
-
-        console.log(`spawning ${role} in ${room.name}`);
+        body = _.sortBy(body);
 
         //find all spawns in our room
         let spawns = room.find(FIND_MY_STRUCTURES, {
@@ -39,6 +32,8 @@ module.exports = {
         for (let i in spawns) {
             //only spawn one creep at a time from each spawn
             if (spawns[i].spawning) continue;
+
+            console.log(`spawning ${role} in ${room.name} with ${body}`);
 
             //spawn the new creep
             spawns[i].spawnCreep(body, makeName(role), {

@@ -2,7 +2,7 @@ const { modules, getCreepsByRole } = require("util.social");
 const { energyStored } = require("util.resource");
 const spawner = require("creep.spawn");
 const { energyCapacity } = require("./util.resource");
-const { minRequired: minCouriersRequired } = require("./role.courier");
+const { getRequired: minCouriersRequired } = require("./role.courier");
 
 //keep track of how max amount of screeps we want based on existing structures that need action
 const register = [
@@ -31,7 +31,7 @@ const nextSpawn = (room) => {
         let item = register[c];
 
         //how many creeps required for this room
-        let requiredCreeps = item.module.minRequired(room);
+        let requiredCreeps = item.module.getRequired(room);
 
         //how many creeps do we have of this role in this room currently?
         let actualCreeps = _.size(getCreepsByRole(room, item.module.role));

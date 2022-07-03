@@ -10,56 +10,30 @@ const withdraw = (creep, room, resource = RESOURCE_ENERGY) => {
         return;
     }
 
-    if (creep.memory.target) {
-        //get the target (must be reloaded)
-        creep.memory.target = Game.getObjectById(creep.memory.target.id);
-
-        //TODO : determine resource type by the target type (i.e mineral vs energy)
-        //check whether the target has any energy
-        if (!creep.memory.target || creep.memory.target.store[resource] == 0) {
-            creep.memory.target = undefined;
-        }
-    }
-
-    if (!creep.memory.target) {
+    if (!creep.memory.target || creep.memory.target.store[resource] == 0) {
         //find the closeset {resource} storage location
         creep.memory.target = closestEnergyStorage(creep);
     }
 
-    //make sure there are resources at the target location
-    if (creep.memory.target && creep.memory.target.store[resource] == 0) {
-        creep.memory.target = undefined;
-    }
-
     //if we found one, then move to it and withdraw
     if (creep.memory.target) {
-        const storedEnergy = energyStored(room);
         let amount = 0; //as much as possible
 
+        //limit withdrawal amount by role
         if (creep.memory.role == "upgrader") {
-            amount = Math.min(
-                creep.store.getFreeCapacity(RESOURCE_ENERGY),
-                storedEnergy * 0.1
-            ); // only 10% max for upgrading
-
-            amount = Math.min(
-                amount,
-                creep.memory.target.store.getUsedCapacity(RESOURCE_ENERGY)
-            );
+            const storedEnergy = energyStored(room);
+            amount = Math.min(creep.store.getFreeCapacity(RESOURCE_ENERGY), storedEnergy * 0.1); // only 10% max for upgrading
+            amount = Math.min(amount, creep.memory.target.store.getUsedCapacity(RESOURCE_ENERGY)); //make sure amount is available in store
         }
 
-        if (
-            creep.withdraw(creep.memory.target, resource, amount) ==
-            ERR_NOT_IN_RANGE
-        ) {
+        if (creep.withdraw(creep.memory.target, resource, amount) == ERR_NOT_IN_RANGE) {
             creep.moveTo(creep.memory.target);
         }
         return;
     }
 
-    //otherwise go harvesting itself
-    creep.memory.action =
-        creep.memory.role != isWorker(creep) ? "harvest" : undefined;
+    //otherwise go harvesting to withdraw
+    creep.memory.action = creep.memory.role != isWorker(creep) ? "harvest" : undefined;
     creep.memory.target = undefined;
     return;
 };

@@ -4,31 +4,16 @@ const getAction = (creep) => {
     return "courier";
 };
 
-const minRequired = (room) => {
+const getRequired = (room) => {
+    //minimum 1 courier, 1 courier per 10 extensions
     let required = Math.max(
         1,
         Math.floor(
             room.find(FIND_STRUCTURES, {
                 filter: { structureType: STRUCTURE_EXTENSION },
-            }).length / 8
+            }).length / 10
         )
     );
-
-    const spawnAndExtensionCapacity = energyCapacity(room, [
-        STRUCTURE_SPAWN,
-        STRUCTURE_EXTENSION,
-    ]);
-
-    if (spawnAndExtensionCapacity > 0) {
-        const extraPercentage =
-            Math.floor(
-                energyStored(room, [STRUCTURE_CONTAINER]) /
-                    spawnAndExtensionCapacity
-            ) * 100;
-
-        //add an extra courier for every extra 500% we have
-        required += Math.floor(extraPercentage / 500);
-    }
 
     return required;
 };
@@ -36,6 +21,6 @@ const minRequired = (room) => {
 module.exports = {
     role: "courier",
     getAction,
-    minRequired,
+    getRequired,
     blueprint: [MOVE, CARRY],
 };

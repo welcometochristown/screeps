@@ -19,7 +19,7 @@ module.exports.loop = function () {
         //action all structures
         structureActioner.run(room);
 
-        //creep actioner runs all the creeps, decides when actions needs to change
+        //action all creeps
         creepActioner.run(room);
     }
 };

@@ -2,121 +2,84 @@ const { closest, linkPair } = require("./util.geography");
 const { targetedAt } = require("./util.creep");
 const { energyStoredPercentage } = require("./util.resource");
 
+const setCourierTarget = (creep, room, find, filter, action) => {
+    const items = room.find(find, { filter });
+
+    if (!items.length) {
+        return false;
+    }
+
+    creep.memory.target = closest(creep, items);
+    creep.memory.action = action;
+    return true;
+};
+
+const setCourierTransfer = (creep, room, find, structureType) =>
+    setCourierTarget(
+        creep,
+        room,
+        find,
+        (structure) =>
+            (!structureType || structure.structureType == structureType) &&
+            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
+        "transfer"
+    );
+
+const setCourierWithdraw = (creep, room, find, structureType, singleTargetOnly = true) =>
+    setCourierTarget(
+        creep,
+        room,
+        find,
+        (structure) =>
+            (!structureType || structure.structureType == structureType) &&
+            (!singleTargetOnly || targetedAt(structure).length == 0) &&
+            structure.store[RESOURCE_ENERGY] > 0,
+        "withdraw"
+    );
+
 const courier = (creep, room) => {
     if (creep.store[RESOURCE_ENERGY] > 0) {
-        //spawns with space
-        const spawns = room.find(FIND_MY_STRUCTURES, {
-            filter: (structure) =>
-                structure.structureType == STRUCTURE_SPAWN &&
-                structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
-        });
-
-        if (spawns.length) {
-            creep.memory.target = closest(creep, spawns);
-            creep.memory.action = "transfer";
+        if (setCourierTransfer(creep, room, FIND_MY_STRUCTURES, STRUCTURE_SPAWN)) {
             return;
         }
-
-        //extensions with space
-        const extensions = room.find(FIND_MY_STRUCTURES, {
-            filter: (structure) =>
-                structure.structureType == STRUCTURE_EXTENSION &&
-                structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
-        });
-
-        if (extensions.length) {
-            creep.memory.target = closest(creep, extensions);
-            creep.memory.action = "transfer";
+        //prettier-ignore
+        if (setCourierTransfer(creep, room, FIND_MY_STRUCTURES, STRUCTURE_EXTENSION)) {
             return;
         }
-
-        //load towers too
-        const towers = room.find(FIND_MY_STRUCTURES, {
-            filter: (structure) =>
-                structure.structureType == STRUCTURE_TOWER &&
-                structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
-        });
-
-        if (towers.length) {
-            creep.memory.target = closest(creep, towers);
-            creep.memory.action = "transfer";
+        //prettier-ignore
+        if (setCourierTransfer(creep, room, FIND_MY_STRUCTURES, STRUCTURE_TOWER)) {
             return;
         }
-
-        //put everything else in the main storage
-        const storages = room.find(FIND_MY_STRUCTURES, {
-            filter: (structure) =>
-                structure.structureType == STRUCTURE_STORAGE &&
-                structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
-        });
-
-        if (storages.length) {
-            creep.memory.target = closest(creep, storages);
-            creep.memory.action = "transfer";
+        //prettier-ignore
+        if (setCourierTransfer(creep, room, FIND_MY_STRUCTURES, STRUCTURE_STORAGE)) {
             return;
         }
-
-        const allStorages = _.flatten(
-            _.map(Game.rooms, (room) =>
-                room.find(FIND_MY_STRUCTURES, {
-                    filter: (structure) =>
-                        structure.structureType == STRUCTURE_STORAGE &&
-                        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
-                        structure.room != undefined,
-                })
-            )
-        );
-
-        if (allStorages.length) {
-            creep.memory.target = closest(creep, allStorages);
-            creep.memory.action = "transfer";
+        //prettier-ignore
+        if (setCourierTransfer(creep, room, FIND_STRUCTURES, STRUCTURE_CONTAINER)) {
             return;
         }
     }
 
-    if (creep.memory.spawnRoom != creep.room.name) {
-        let spawnRoom = Game.rooms[creep.memory.spawnRoom];
-        let spawn = spawnRoom.find(FIND_STRUCTURES, {
-            filter: { structureType: STRUCTURE_SPAWN },
-        })[0];
-        creep.moveTo(spawn);
+    //creep has no free capacity, and we found no target for the energy
+    if (creep.store.getFreeCapacity() == 0) {
+        creep.memory.target = undefined;
+        creep.memory.action = undefined;
         return;
     }
 
     //TODO : keeps getting -7 errors. no idea why
-    // const droppedEnergy = room.find(FIND_DROPPED_RESOURCES, {
-    //     filter: { resourceType: RESOURCE_ENERGY },
-    // });
-
-    // if (droppedEnergy.length > 0) {
-    //     console.log("picking up dropped energy ");
-    //     let target = closest(creep, droppedEnergy);
-    //     creep.memory.target = target;
-    //     creep.memory.action = "pickup";
+    // also issues with accessing the energy store
+    // //prettier-ignore
+    // if(setCourierWithdraw(creep, room, FIND_DROPPED_RESOURCES))
     //     return;
-    // }
 
-    const tombStones = room.find(FIND_TOMBSTONES, {
-        filter: (tombstone) =>
-            tombstone.store[RESOURCE_ENERGY] > 0 &&
-            targetedAt(tombstone).length == 0,
-    });
-    if (tombStones.length) {
-        creep.memory.target = closest(creep, tombStones);
-        creep.memory.action = "withdraw";
+    //prettier-ignore
+    if(setCourierWithdraw(creep, room, FIND_TOMBSTONES))
         return;
-    }
 
-    const ruins = room.find(FIND_RUINS, {
-        filter: (ruin) =>
-            ruin.store[RESOURCE_ENERGY] > 0 && targetedAt(ruin).length == 0,
-    });
-
-    if (ruins.length) {
-        creep.memory.target = closest(creep, ruins);
-        creep.memory.action = "withdraw";
+    //prettier-ignore
+    if(setCourierWithdraw(creep, room, FIND_RUINS))
         return;
-    }
 
     const pair = linkPair(creep.room);
     if (pair && pair.reciever.store[RESOURCE_ENERGY] > 0) {
@@ -125,36 +88,18 @@ const courier = (creep, room) => {
         return;
     }
 
-    const containers = room.find(FIND_STRUCTURES, {
-        filter: (structure) =>
-            structure.structureType == STRUCTURE_CONTAINER &&
-            structure.store[RESOURCE_ENERGY] > 0,
-    });
-
-    if (containers.length) {
-        creep.memory.target = closest(creep, containers);
-        creep.memory.action = "withdraw";
-        return;
-    }
-
-    if (
-        energyStoredPercentage(room, [STRUCTURE_SPAWN, STRUCTURE_EXTENSION]) < 1
-    ) {
-        const storages = room.find(FIND_MY_STRUCTURES, {
-            filter: (structure) =>
-                structure.structureType == STRUCTURE_STORAGE &&
-                structure.store[RESOURCE_ENERGY] > 0,
-        });
-
-        if (storages.length) {
-            creep.memory.target = closest(creep, storages);
-            creep.memory.action = "withdraw";
+    //prettier-ignore
+    if (energyStoredPercentage(room, [STRUCTURE_SPAWN, STRUCTURE_EXTENSION]) < 1) {
+        if(!setCourierWithdraw(creep, room, FIND_MY_STRUCTURES, STRUCTURE_STORAGE, false))
             return;
-        }
     }
+
+    //prettier-ignore
+    if(setCourierWithdraw(creep, room, FIND_STRUCTURES, STRUCTURE_CONTAINER, false))
+        return;
 
     creep.memory.target = undefined;
-    creep.memory.action = "harvest";
+    creep.memory.action = undefined;
 };
 
 module.exports = {

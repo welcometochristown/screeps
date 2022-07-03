@@ -1,20 +1,18 @@
-const { closestEnergyTransfer } = require("./util.geography");
-
 const getAction = (creep) => {
-    if (closestEnergyTransfer(creep)) {
-        return "harvest"; //harvest if there are empty sources to store it in
-    } else if (creep.room.find(FIND_MY_CONSTRUCTION_SITES).length) {
-        return "build"; //assist with building if there are construction sites
-    } else {
-        return "upgrade"; //otherwise upgrade duty
+    if (creep.store.getFreeCapacity() === 0) {
+        return "transfer";
     }
+    return "harvest";
 };
 
-const minRequired = (room) => room.find(FIND_SOURCES).length;
+const getRequired = (room) => {
+    const roomInfo = _.find(Memory.rooms, (r) => r.room.name === room.name);
+    return _.sum(roomInfo.sources, (source) => source.limit);
+};
 
 module.exports = {
     role: "harvester",
     getAction,
-    minRequired,
+    getRequired,
     blueprint: [MOVE, CARRY, WORK],
 };

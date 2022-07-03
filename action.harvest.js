@@ -1,19 +1,6 @@
-const { targetedAt } = require("util.creep");
 const { closest } = require("util.geography");
 const { isWorker } = require("util.creep");
-
-const isSourceFull = (source) => {
-    //get room info memory object
-    let roomInfo = Memory.rooms.find((i) => i.room.name == source.room.name);
-
-    //info about the source
-    let sourceInfo = roomInfo.sources.find((i) => i.source.id == source.id);
-
-    //current count of creeps working on this source
-    let creepCount = targetedAt(source).length;
-
-    return creepCount >= sourceInfo.limit;
-};
+const { isSourceFull } = require("util.resource");
 
 const harvest = (creep, room) => {
     if (!isWorker(creep)) {
@@ -22,45 +9,32 @@ const harvest = (creep, room) => {
         return;
     }
 
-    if (creep.memory.target) {
-        creep.memory.target = Game.getObjectById(creep.memory.target.id);
-    }
-
+    //if creep has no target, or target is empty find a new one
     if (!creep.memory.target || creep.memory.target.energy == 0) {
         let sources = room.find(FIND_SOURCES, {
             filter: (source) => source.energy > 0,
         });
-        let closestSource = closest(creep, sources);
 
-        //TODO: Update to work with multiple rooms
-        while (sources.length) {
-            //get the next closest source
-            let source = closest(creep, sources);
+        let emptySources = _.filter(sources, (source) => !isSourceFull(source));
 
-            //if source is full, remove from list and lets go again
-            if (isSourceFull(source)) {
-                sources = _.filter(sources, (s) => s.id !== source.id);
-            } else {
-                closestSource = source;
-                break;
-            }
+        if (emptySources.length) {
+            creep.memory.target = closest(creep, emptySources);
+        } else {
+            creep.memory.target = closest(creep, sources);
         }
-
-        creep.memory.target = closestSource;
     }
 
+    //move to target and harvest
     if (creep.memory.target) {
-        switch (creep.harvest(creep.memory.target)) {
-            case ERR_NOT_IN_RANGE:
-                creep.moveTo(creep.memory.target);
-                break;
+        if (creep.harvest(creep.memory.target) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(creep.memory.target);
+            return;
         }
     }
 
-    if (creep.store[RESOURCE_ENERGY] == creep.store.getCapacity()) {
-        //harvesters should transfer the energy, but other harvesting creeps may want to use the energy for something else
-        creep.memory.action =
-            creep.memory.role == "harvester" ? "transfer" : undefined;
+    //finished harvesting because capacity is full
+    if (creep.store.getFreeCapacity() === 0) {
+        creep.memory.action = undefined;
         creep.memory.target = undefined;
     }
 };

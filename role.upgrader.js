@@ -4,7 +4,7 @@ const getAction = (creep) => {
     return "upgrade"; //always try and upgrade
 };
 
-const minRequired = (room) => {
+const getRequired = (room) => {
     if (!room.controller) return 0;
     return Math.max(Math.floor(energyStored(room) / 25000), 1);
 };
@@ -12,6 +12,6 @@ const minRequired = (room) => {
 module.exports = {
     role: "upgrader",
     getAction,
-    minRequired,
+    getRequired,
     blueprint: [MOVE, CARRY, WORK],
 };

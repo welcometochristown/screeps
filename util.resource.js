@@ -1,3 +1,5 @@
+const { targetedAt } = require("util.creep");
+
 const minerals = [
     RESOURCE_HYDROGEN,
     RESOURCE_OXYGEN,
@@ -38,9 +40,23 @@ const energyStoredPercentage = (room, structureTypes) => {
     return capacity == 0 ? 0 : stored / capacity;
 };
 
+const isSourceFull = (source) => {
+    //get room info memory object
+    let roomInfo = Memory.rooms.find((i) => i.room.name == source.room.name);
+
+    //info about the source
+    let sourceInfo = roomInfo.sources.find((i) => i.source.id == source.id);
+
+    //current count of creeps working on this source
+    let creepCount = targetedAt(source).length;
+
+    return creepCount >= sourceInfo.limit;
+};
+
 module.exports = {
     energyStored,
     energyCapacity,
     energyStoredPercentage,
     minerals,
+    isSourceFull,
 };

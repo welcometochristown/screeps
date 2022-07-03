@@ -13,10 +13,6 @@ const mine = (creep, room) => {
         return;
     }
 
-    if (creep.memory.target) {
-        creep.memory.target = Game.getObjectById(creep.memory.target.id);
-    }
-
     if (!creep.memory.target) {
         const deposits = room.find(FIND_MINERALS, {
             filter: (deposit) => deposit.mineralAmount > 0,

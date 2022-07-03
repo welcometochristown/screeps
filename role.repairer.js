@@ -12,9 +12,7 @@ const getAction = (creep) => {
             filter: (structure) =>
                 (structure.hits < structure.hitsMax * 0.5 &&
                     targetedAt(structure).length == 0 &&
-                    ![STRUCTURE_WALL, STRUCTURE_RAMPART].includes(
-                        structure.structureType
-                    )) ||
+                    ![STRUCTURE_WALL, STRUCTURE_RAMPART].includes(structure.structureType)) ||
                 structure.hits < 50000,
         }).length
     ) {
@@ -35,12 +33,11 @@ const getAction = (creep) => {
     return "harvest";
 };
 
-const minRequired = (room, structures = room.find(FIND_MY_STRUCTURES)) =>
-    Math.ceil(structures.length / 25);
+const getRequired = (room, structures = room.find(FIND_MY_STRUCTURES)) => Math.ceil(structures.length / 25);
 
 module.exports = {
     role: "repairer",
     getAction,
-    minRequired,
+    getRequired,
     blueprint: [MOVE, CARRY, WORK],
 };

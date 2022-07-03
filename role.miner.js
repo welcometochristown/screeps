@@ -1,11 +1,11 @@
 const { minerals } = require("util.resource");
 
 const getAction = (creep) => {
-    if (!minRequired(creep.room)) return "harvest";
+    if (!getRequired(creep.room)) return "harvest";
     return "mine";
 };
 
-const minRequired = (
+const getRequired = (
     room,
     deposits = room.find(FIND_MINERALS, {
         filter: (deposit) => deposit.mineralAmount > 0,
@@ -27,6 +27,6 @@ const minRequired = (
 module.exports = {
     role: "miner",
     getAction,
-    minRequired,
+    getRequired,
     blueprint: [MOVE, CARRY, WORK],
 };
